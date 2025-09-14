@@ -24,7 +24,9 @@ def fetch_secured_series()가 정의된 곳이다.
 New York Fed Markets Data API에서 secured volume 또는 rate(1일물 증권담보대출금리 거래의 거래량)을 fetch한다. parameter에서 "type":을 'volume'과 'rate' 가운데 하나를 넣는다. 
 "rate_type"으로 all, tgcr, bgcr, sofr, sofrai 가운데 하나를 넣는다. all을 쓰면 모두 호출된다.
 "type"으로 volume, 또는 rate 하나를 선택한다.
-### 
+### nyfed_rrp_vol.py
+def fetch_rrp_vol() 이 정의된 곳이다.
+New York Markets Data API에서 뉴욕 연준의 rp 거래 또는 rrp 거래의 거래량을 fetch한다.
 
 
 
