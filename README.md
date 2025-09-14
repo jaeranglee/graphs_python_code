@@ -17,9 +17,13 @@ python 3.13으로 작성하였다. jupyter notebook에서도 실행가능하지�
 ## def 정의 파일
 
 #### fred_api.py
-St. Louise Fed FRED Open API에서 자료를 fetch 한다.  
-#### nyfed_api_vol
-New York Fed Markets Data API에서 secured volume 또는 rate(1일물 증권담보대출금리 거래의 거래량)을 fetch한다. parameter에서 "type":을 'volume'과 'rate' 가운데 하나를 넣는다. "rate_type"으로 all, tgcr, bgcr, sofr, sofrai 가운데 하나를 넣는다. all을 쓰면 모두 호출된다.
+def fetch_fred_series()가 정의된 곳이다.
+St. Louise Fed FRED Open API에서 자료를 fetch 한다.
+#### nyfed_api_vol_rate.py
+def fetch_secured_series()가 정의된 곳이다.
+New York Fed Markets Data API에서 secured volume 또는 rate(1일물 증권담보대출금리 거래의 거래량)을 fetch한다. parameter에서 "type":을 'volume'과 'rate' 가운데 하나를 넣는다. 
+"rate_type"으로 all, tgcr, bgcr, sofr, sofrai 가운데 하나를 넣는다. all을 쓰면 모두 호출된다.
+"type"으로 volume, 또는 rate 하나를 선택한다.
 ### 
 
 
