@@ -16,17 +16,6 @@ def 함수를 정의한 py 파일에 포함된 코멘트 라인은 책자의 부
 
 ## def 정의 파일
 
-#### fred_api.py
-def fetch_fred_series()가 정의된 곳이다.
-St. Louise Fed FRED Open API에서 자료를 fetch 한다.
-#### nyfed_api_vol_rate.py
-def fetch_secured_series()가 정의된 곳이다.
-New York Fed Markets Data API에서 secured volume 또는 rate(1일물 증권담보대출금리 거래의 거래량)을 fetch한다. parameter에서 "type":을 'volume'과 'rate' 가운데 하나를 넣는다. 
-"rate_type"으로 all, tgcr, bgcr, sofr, sofrai 가운데 하나를 넣는다. all을 쓰면 모두 호출된다.
-"type"으로 volume, 또는 rate 하나를 선택한다.
-#### nyfed_rrp_vol.py
-def fetch_rrp_vol() 이 정의된 곳이다.
-New York Markets Data API에서 뉴욕 연준의 rp 거래 또는 rrp 거래의 거래량을 fetch한다.
 #### imf_api.py
 def fetch_cofer_data()  
 def fetch_gold_data()  
@@ -34,6 +23,25 @@ def convert_period_to_date()
 세 개의 def가 있다. 각각 IMF COFER Dataset에서 통화별 외환보유액 구성자료 fetch,
 IMF IL Dataset에서 국가별 금보유량, 금보유액, 외환보유액 자료 fetch
 IMF Dataset의 날짜 형식을 FRED 날짜형식으로 전환을 위한 함수이다.
+
+#### fred_api.py
+
+def fetch_fred_series()가 정의된 곳이다.
+St. Louise Fed FRED Open API에서 자료를 fetch 한다.
+
+### nyfed_api_all_rates.py
+def fetch_all_secured_rates()가 정의된 곳이다. 아래의 자룔를 fetch한다.
+New York Fed Markets Data, Reference Rates, Secured Rates, rates and percentile
+
+#### nyfed_api_vol_rate.py
+def fetch_secured_series()가 정의된 곳이다.
+New York Fed Markets Data API에서 secured volume 또는 rate(1일물 증권담보대출금리 거래의 거래량)을 fetch한다. parameter에서 "type":을 'volume'과 'rate' 가운데 하나를 넣는다. 
+"rate_type"으로 all, tgcr, bgcr, sofr, sofrai 가운데 하나를 넣는다. all을 쓰면 모두 호출된다.
+"type"으로 volume, 또는 rate 하나를 선택한다.
+
+#### nyfed_rrp_vol.py
+def fetch_rrp_vol() 이 정의된 곳이다.
+New York Fed Markets Data API에서 뉴욕 연준의 rp 거래 또는 rrp 거래의 거래량을 fetch한다.
 
 
 
