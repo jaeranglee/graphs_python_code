@@ -31,9 +31,9 @@ New York Markets Data API에서 뉴욕 연준의 rp 거래 또는 rrp 거래의 
 def fetch_cofer_data()  
 def fetch_gold_data()  
 def convert_period_to_date()  
-세 개의 def가 있다. IMF COFER Dataset에서 통화별 외환보유액 구성자료 fetch,
-IMF IL Dataset에서 국바별 금보유량, 금보유액, 외환보유액 자료 fetch
-IMF Dataset의 날짜 형식을 FRED 날짜형식으로 전환
+세 개의 def가 있다. 각각 IMF COFER Dataset에서 통화별 외환보유액 구성자료 fetch,
+IMF IL Dataset에서 국가별 금보유량, 금보유액, 외환보유액 자료 fetch
+IMF Dataset의 날짜 형식을 FRED 날짜형식으로 전환을 위한 함수이다.
 
 
 
