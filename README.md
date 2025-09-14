@@ -20,7 +20,7 @@ def 함수를 정의한 py 파일에 포함된 코멘트 라인은 책자의 부
 파일의 이름이 모두 유사한 패턴이다. 그림1을 그린 파일은 아래와 같다.
 
 #### f1_bank_deposits.py
-'[그림1] 은행예금 잔액과 은행업 ETF가격'을 그린 파일이다.
+'[그림1] 은행예금 잔액과 은행업 ETF가격'을 그린 파일이다. fred_api.py 파일에 있는
 fetch_fred_series() 함수와 yfinance package가 이용된다.
 
 ## def 정의 파일
