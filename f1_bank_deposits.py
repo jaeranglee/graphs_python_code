@@ -27,7 +27,6 @@ if platform.system() == 'Darwin':
     plt.rcParams['font.family'] = 'AppleGothic'
 else:
     plt.rcParams['font.family'] = 'Malgun Gothic'
-    
 plt.rcParams['axes.unicode_minus'] = False
 
 
