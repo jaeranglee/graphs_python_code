@@ -16,6 +16,11 @@ def 함수를 정의한 py 파일에 포함된 코멘트 라인은 책자의 부
 
 ## def 정의 파일
 
+#### fred_api.py
+
+def fetch_fred_series()가 정의된 곳이다.
+St. Louise Fed FRED Open API에서 자료를 fetch 한다.
+
 #### imf_api.py
 def fetch_cofer_data()  
 def fetch_gold_data()  
@@ -24,12 +29,7 @@ def convert_period_to_date()
 IMF IL Dataset에서 국가별 금보유량, 금보유액, 외환보유액 자료 fetch
 IMF Dataset의 날짜 형식을 FRED 날짜형식으로 전환을 위한 함수이다.
 
-#### fred_api.py
-
-def fetch_fred_series()가 정의된 곳이다.
-St. Louise Fed FRED Open API에서 자료를 fetch 한다.
-
-### nyfed_api_all_rates.py
+#### nyfed_api_all_rates.py
 def fetch_all_secured_rates()가 정의된 곳이다. 아래의 자룔를 fetch한다.
 New York Fed Markets Data, Reference Rates, Secured Rates, rates and percentile
 
