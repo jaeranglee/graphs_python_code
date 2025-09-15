@@ -25,6 +25,9 @@ fetch_fred_series() 함수와 yfinance package가 이용된다.
 
 ## def 정의 파일
 
+fx_로 시작되는 그래프 작성코드 안에 data를 fetch하는 def 함수를 사용했다. 모든 그래프는 아래
+함수를 사용해서 불러온 data로 그린 것이다.
+
 #### fred_api.py
 
 def fetch_fred_series()가 정의된 곳이다.
