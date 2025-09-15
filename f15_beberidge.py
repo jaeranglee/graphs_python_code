@@ -1,25 +1,18 @@
-# [그림 14] 베버리지커브: 구인율과 실업률
+# [그림 15] 베버리지커브: 구인율과 실업률
 
 # 이용되는 API data fetch function
 
 # from fred_api import fetch_fred_series
+# from plot_def import set_fonts
 # from plot_def import plot_save
 
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.ticker import PercentFormatter
-import platform
 
-
-# 마이너스 기호 깨짐 방지
-plt.rcParams['axes.unicode_minus'] = False
-
-# 폰트 설정
-if platform.system() == 'Darwin':
-    plt.rcParams['font.family'] = 'AppleGothic'
-else:
-    plt.rcParams['font.family'] = 'Malgun Gothic'
-
+# 한글 폰트 설정
+from plot_def import set_fonts
+set_fonts()
 
 
 

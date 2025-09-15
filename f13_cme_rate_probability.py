@@ -9,20 +9,21 @@
 
 # 저작권 문제로 csv 파일을 GitHub에 올리지 않았다.
 
+# 사용한 def
+# 그림 저장 함수
+
+# from plot_py import plot_save
+
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import platform
 from datetime import datetime
 
-# 마이너스 기호 깨짐 방지
-plt.rcParams['axes.unicode_minus'] = False
-
-# 폰트 설정
-if platform.system() == 'Darwin':
-    plt.rcParams['font.family'] = 'AppleGothic'
-else:
-    plt.rcParams['font.family'] = 'Malgun Gothic'
+# 한글 폰트 설정
+from plot_def import set_ponts
+set_ponts()
 
 
 df_pro = pd.read_csv('data/FedMeeting_20250917.csv')
@@ -52,30 +53,6 @@ ax.grid(True, linestyle='--', color='gray', alpha=0.3)
 
 # 저장 및 출력
 # python py 파일 이름과 동일한 이름으로 그림 파일을 tif, jpg로 저장하는 루틴
-import os
-from PIL import Image
 
-
-## 현재 작업 중인 파일 이름 추출 (확장자 제거)
-
-try:
-    base_filename = os.path.splitext(os.path.basename(__file__))[0]
-except NameError:
-    base_filename = "default_filename"
-
-# 저장 경로 설정
-image_path_tif = f"pic_tif/{base_filename}.tif"
-image_path_jpg = f"pic_jpg/{base_filename}.jpg"
-
-# 디렉토리 없으면 자동 생성
-os.makedirs("pic_tif", exist_ok=True)
-os.makedirs("pic_jpg", exist_ok=True)
-
-# 그래프 저장
-plt.savefig(image_path_tif, dpi=300)
-plt.savefig(image_path_jpg, dpi=300)
-
-# JPEG → CMYK 변환 후 덮어쓰기
-img = Image.open(image_path_jpg).convert("CMYK")
-img.save(image_path_jpg, "JPEG")
-plt.show()
+from plot_def import plot_save
+plot_save()
