@@ -2,15 +2,12 @@
 ##[그림 7] MMF와 은행예금 이자율
 
 import matplotlib.pyplot as plt
+
 import matplotlib.dates as mdates
-import platform
 
 # 폰트 설정
-if platform.system() == 'Darwin':
-    plt.rcParams['font.family'] = 'AppleGothic'
-else:
-    plt.rcParams['font.family'] = 'Malgun Gothic'
-plt.rcParams['axes.unicode_minus'] = False
+from plot_def import *
+set_fonts()
 
 ## FRED 자료 불러오기
 
@@ -105,30 +102,5 @@ ax[1].grid(False)
 
 # 저장 및 출력
 # python py 파일 이름과 동일한 이름으로 그림 파일을 tif, jpg로 저장하는 루틴
-import os
-from PIL import Image
 
-
-## 현재 작업 중인 파일 이름 추출 (확장자 제거)
-
-try:
-    base_filename = os.path.splitext(os.path.basename(__file__))[0]
-except NameError:
-    base_filename = "default_filename"
-
-# 저장 경로 설정
-image_path_tif = f"pic_tif/{base_filename}.tif"
-image_path_jpg = f"pic_jpg/{base_filename}.jpg"
-
-# 디렉토리 없으면 자동 생성
-os.makedirs("pic_tif", exist_ok=True)
-os.makedirs("pic_jpg", exist_ok=True)
-
-# 그래프 저장
-plt.savefig(image_path_tif, dpi=300)
-plt.savefig(image_path_jpg, dpi=300)
-
-# JPEG → CMYK 변환 후 덮어쓰기
-img = Image.open(image_path_jpg).convert("CMYK")
-img.save(image_path_jpg, "JPEG")
-plt.show()
+plot_save()
