@@ -26,7 +26,7 @@ jupyter notebook에서도 실행가능하지만 그래프 저장 관련 코드�
 'f숫자_'로 시작하는 py 파일이 그래프를 작성하는 파일입니다. 그래프를 그리는
 파일의 이름이 모두 같은 방식의 이름으로 시작합니다. 
 
-#### f1_bank_deposits.py
+### f1_bank_deposits.py
 '[그림1] 은행예금 잔액과 은행업 ETF가격'을 그린 파일입니다. fred_api.py 파일에 있는
 fetch_fred_series() 함수와 yfinance package가 이용됩니다.
 
@@ -37,38 +37,49 @@ fetch_fred_series() 함수와 yfinance package가 이용됩니다.
 그래프를 그리게 됩니다.
 그림을 정해진 규칙의 이름으로 저장하는 함수도 있습니다.
 
-#### fred_api.py
+### fred_api.py
 
 fetch_fred_series()가 정의된 곳입니다.
 St. Louise Fed FRED Open API에서 자료를 fetch 합니다.
 
-#### imf_api.py
-fetch_cofer_data()  
-fetch_gold_data()  
-convert_period_to_date()  
+### imf_api.py
 세 개의 def가 있습니다. 각각 IMF COFER Dataset에서 통화별 외환보유액 구성자료 fetch,
 IMF IL Dataset에서 국가별 금보유량, 금보유액, 외환보유액 자료 fetch,
 IMF Dataset의 날짜 형식을 FRED 날짜형식으로 전환하는 함수입니다.
 
-#### nyfed_api_all_rates.py
+#### fetch_cofer_data()
+#### fetch_gold_data() 
+#### convert_period_to_date()  
+
+### nfp_revision.py
+
+세인트루이스 연준의 ALFRED(ArchivaL Federal Reserve Economic Data) Open API에서 NFP(Total Nonfarm Payrolls)
+과거 자료(vintages)를 불러온 다음 수정치(revisions)를
+계산한 후 csv 파일로 저장합니다. 파일이름은
+"data/nfp_revisions.csv"로 지정했습니다. 
+'[그림15] NFP 고용 수정전후 비교', '[그림16] 직전 2개월 NFP 수정치'에 csv 파일을 
+이용합니다. 매번 api로 자료를 불러와서 계산하면 속도가 느리기 때문에 필요시 자료를 불러와 계산하고 저장한 다음
+분석에 이용하는 것이 좋습니다. 1990년 vintage부터 불러오기 때문에 코드 실행후 완료까지 5분이상 소요됩니다.
+
+### nyfed_api_all_rates.py
 fetch_all_secured_rates()가 정의된 곳입니다. 뉴욕 연준에서 아래의 자룔를 fetch합니다.
 New York Fed Markets Data, Reference Rates, Secured Rates, rates and percentile
 
-#### nyfed_api_vol_rate.py
+### nyfed_api_vol_rate.py
 fetch_secured_series()가 정의된 곳입니다.
 New York Fed Markets Data API에서 secured volume 또는 rate(1일물 증권담보대출금리 거래의 거래량)을 fetch합니다. 
 parameter에서 "type":을 'volume'과 'rate' 가운데 하나를 선택합니다. 
 "rate_type"으로 all, tgcr, bgcr, sofr, sofrai 가운데 하나를 입력합니다. all은 모든 자료를 호출합니다.
 "type"으로 volume, 또는 rate 하나를 선택합니다.
 
-#### nyfed_rrp_vol.py
+### nyfed_rrp_vol.py
 fetch_rrp_vol() 이 정의된 곳입니다.
 New York Fed Markets Data API에서 뉴욕 연준의 rp 거래 또는 rrp 거래의 거래량을 fetch합니다.
 
-#### plot_def.py
-그래프와 관련된 다음 함수들이 정의된 파일입니다.  
+### plot_def.py
+그래프와 관련된 함수들이 정의된 파일입니다.  
   
-set_fonts()  
+#### set_fonts()
   
 모든 그래프 코드 앞에 한글 폰트를 정의하는 코드가 들어갑니다.
 애플 시스템 또는 윈도우 시스템인지 사용자 환경에 따라 맞는 폰트를 정합니다.
@@ -76,20 +87,21 @@ set_fonts()
 첫 10여 개의 그림에는 폰트 정의 코드라인을 직접 그래프 코드 파일에 
 포함했습니다. 
   
-nber_recession(start, end)  
+#### nber_recession(start, end)  
   
-그래프에 미국의 경기침체기(NBER 기준)를 음영으로 넣어주는 함수입니다.
+기존 그래프에 미국의 경기침체기(NBER 기준)를 음영으로 넣어주는 함수입니다.
 입력 파라미터 start, end가 반드시 있어야 합니다.
-자료 시작일 start, 자료 종료일 end를 그래프와 같게 하여야 합니다.
+자료 시작일 start, 자료 종료일 end를 기존 그래프와 같게 하여야 합니다.
   
-아래 두 줄의 코드를 원하는 plot 시작 line 아래에 넣어야 합니다.  
+아래 코드를 plot code line 아래에 넣어야 합니다.   
 
+from plot_def import nber_recession  
+recession_periods = nber_recesssion(start=start, end=end)  
 for peak, trough in recession_periods:  
-    ax.axvspan(peak, trough, color='gray', alpha=0.3)  
-  
+    ax.axvspan(peak, trough, color='gray', alpha=0.3)
   
 
-plot_save(i=None):  
+#### plot_save(i=None):  
 
 그래프를 파일로 저장하는 함수입니다.
 그래프를 그리는 코드의 이름을 파일 이름으로 사용합니다.

@@ -1,10 +1,10 @@
-# NFP와 ADP 월별 증가인원, JOLT 구인건수
+#[그림 14] 월별 구인건수와 고용 증감
 
-# 이용되는 API data fetch function
+# 사용하는 함수 파일
 
-# from fred_api import fetch_fred_series
-# from plot_def import set_fonts
-# from plot_def import plot_save
+# fred_api.py
+# plot_def.py
+
 
 
 
@@ -26,20 +26,20 @@ end = '2025-12-31'
 series_ids ={
 
     "NFP": 'PAYEMS',
-    'ADP': 'ADPWNUSNERSA',
+    'ADP': 'ADPMNUSNERSA',
     'Job Openings': 'JTSJOL'
 }
 
-# 모든 데이터 가져오기
-# 이름을 Fred series_id를 공식명칙으로 변환
+# 데이터 가져오기
+# Fred series_id를 일반 명칭으로 변환
 
 all_data = {}
 for term, sid in series_ids.items():
-    df = fetch_fred_series(sid, start_date=start, end_date=end)
-    df.rename(columns={df.columns[-1]: "value"}, inplace=True)
+    df_temp = fetch_fred_series(sid, start_date=start, end_date=end)
+    df_temp.rename(columns={df_temp.columns[-1]: "value"}, inplace=True)
 
     # Series로 변환
-    s = df.set_index("observation_date")["value"]
+    s = df_temp.set_index("observation_date")["value"]
 
 
     # Weekly or Daily to Monthly
@@ -81,20 +81,20 @@ jolt_highlight_month = pd.to_datetime(jolt_highlight_month)
 
 # NFP 색상 지정 (9월만 red)
 colors_nfp = [
-    "red" if d.month == 8 and d.year == nfp_highlight_month.year else colors[1]
+    "red" if d.month == 9 and d.year == nfp_highlight_month.year else colors[1]
     for d in df_all.index
 ]
 
 # ADP 색상 지정 (9월만 red)
 colors_adp = [
-    "red" if d.month == 8 and d.year == nfp_highlight_month.year else colors[1]
+    "red" if d.month == 9 and d.year == nfp_highlight_month.year else colors[1]
     for d in df_all.index
 ]
 
 
 # JOLT 색상 지정 (8월만 파란색, 나머지는 red)
 colors_jolt = [
-    "blue" if d.month == 9 and d.year == jolt_highlight_month.year else colors[0]
+    "blue" if d.month == 8 and d.year == jolt_highlight_month.year else colors[0]
     for d in df_all.index
 ]
 
@@ -138,9 +138,9 @@ for i in [0,1,2]:
     ax[i].text(0, 1.00, '(천명)', ha='left', va='bottom', color='black',
              fontsize=12, rotation=0, transform=ax[i].transAxes)
 
-ax[0].text(0.0, -0.15, "출처: FRED, 파란색은 2023년 9월", transform=ax[0].transAxes, fontsize=10, ha='left')
-ax[1].text(0.0, -0.15, "붉은색은 2023년 8월", transform=ax[1].transAxes, fontsize=10, ha='left')
-ax[2].text(0.0, -0.15, "파란색은 2023년 8월", transform=ax[2].transAxes, fontsize=10, ha='left')
+ax[0].text(0.0, -0.15, "출처: FRED, 파란색은 2023년 8월", transform=ax[0].transAxes, fontsize=10, ha='left')
+ax[1].text(0.0, -0.15, "붉은색은 2023년 9월", transform=ax[1].transAxes, fontsize=10, ha='left')
+ax[2].text(0.0, -0.15, "붉은색은 2023년 9월", transform=ax[2].transAxes, fontsize=10, ha='left')
 
 
 # 그림 파일로 저장

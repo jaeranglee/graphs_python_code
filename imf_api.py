@@ -29,7 +29,7 @@ SDMX 2.1 API를 선택해 들어간다.
 //
 아래 코드는 IMF IFS COFER Dataset에서 외환보유액의 통화별 구성 자료를 가져오는 함수이다.
 imf_api.py 파일로 저장해 놓았다.
-'[그림 49] 전세계 외환보유액의 주요 통화별 구성'을 그릴 때 fetch_cofer_data() 함수로 자료를 호출했다.
+'[그림 52] 전세계 외환보유액의 주요 통화별 구성'을 그릴 때 fetch_cofer_data() 함수로 자료를 호출했다.
 //
 SDMX 2.1 API endpoint에서 자료를 가져온다.
 다른 Dataset에서 자료를 가져오려면 endpoint와 field 등을 그 Dataset에 맞게 수정해야 한다.
