@@ -1,12 +1,13 @@
-#fiscaldata.treasury.gov API format
-# request url takes so long time.
-# json file 로 저장해서 사용하는 def
+'''
+미국 재무부 Fiscal Data API에서 Treasury Securities, DTS, MSPD, data를 가져와서 처리하는 코드입니다.
+request url을 매번 사용하면 시간이 오래 걸려 불편하기 때문에 직접 Fiscal Data 페이지에서
+json file 로 다운 받아 처리하는 용도입니다.
 
-#---------------------------
-# Public Debt issuance, DTS 자료
-# 저장해 둔 json file 사용
+사용 예시는 다음과 같습니다.
+
+Public Debt issuance, DTS 자료
+저장해 둔 json file 사용
 # file_path ="data/DTS_PubDebtTrans_20051003_20250814.json"
-#
 # def fetch_debt_issues_json(start_date=start, end_date=end, json_path = file_path):
 
 #---------------------------
@@ -14,8 +15,7 @@
 # 받아놓은 jason file에서
 # file_path="data/MSPD_SumSecty_20010131_20250731.json"
 # def fetch_debt_outstanding_json(start_date=start, end_date=end, json_path=file_path):
-
-
+'''
 
 
 import requests
@@ -24,7 +24,8 @@ import matplotlib.dates as mdates
 
 
 '''
-# 데이터 불러와서 저장(시간 오래 걸림)
+# 아래 endpoint에서 request 할 수 있습니다. 그러나 fetch 시간이 너무 오래 걸려 홈피에서 파일로 다운 받기를 권장합니다.
+
 url = "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/dts/public_debt_transactions"
 
 params = {
@@ -37,7 +38,9 @@ params = {
 
 
 '''
-# 저장해 둔 CSV 파일 사용
+# 홈피에서 CSV 파일로 다운 받을 수도 있습니다. csv 파일의 경우를 위한 코드입니다.
+# 활성화 해서 사용할 수 있습니다.
+
 file_path="data/marketable_debt_transactions.csv"
 def fetch_debt_issues_csv(start_date="2005-01-01", end_date="2025-12-31",
                           file_path=file_path):
@@ -45,8 +48,12 @@ def fetch_debt_issues_csv(start_date="2005-01-01", end_date="2025-12-31",
     df=pd.read_csv(file_path)
 '''
 
-# Public Debt issuance, DTS 자료
-# 저장해 둔 json file 사용
+# Public Debt issuance, DTS 자료를 json 포맷으로 다운 받습니다.
+
+# 미국 국채 일별 발행 자료입니다.
+
+# 저장해 둔 json file을 parsing 하는 함수가 시작됩니다.
+# start_date, end_date, json_path는 원 코드에서 이 함수를 호술할 때 넣어줍니다.
 
 def fetch_debt_issues_json(start_date, end_date, json_path):
 
@@ -131,11 +138,14 @@ def fetch_debt_issues_json(start_date, end_date, json_path):
     issues = issues.rename(columns={'transaction_today_amt': 'issues'}).copy()
     redemptions = redemptions.rename(columns={'transaction_today_amt': 'redemtions'}).copy()
 
+    # 리턴 값은 순서대로 다음과 같습니다.
+    # 월별 국채종류별 발행액, 월별 국채종류별 상환액, 월별 총발행액, 월별 국채종류별 순발행액(발행액-상환액), 연간 순발행액, 일간 자료
+
     return monthly_issues, monthly_redemptions, monthly_total, net, yearly_net, issues
 
 
 # Public Debt Outstanding, Monthly Statement of the Public Debt
-# 받아놓은 jason file에서
+# 에서 받아놓은 jason file에서 parsing 합니다.
 
 
 def fetch_debt_outstanding_json(start_date, end_date, json_path):
@@ -168,5 +178,7 @@ def fetch_debt_outstanding_json(start_date, end_date, json_path):
     # 날짜 인덱스 설정
     df.set_index('Record Date', inplace=True)
     #print(df.head())
+
+    # 월별 국채 종류별 outstanding value를 리턴합니다.
     return df
 
