@@ -48,9 +48,11 @@ def fetch_debt_issues_csv(start_date="2005-01-01", end_date="2025-12-31",
     df=pd.read_csv(file_path)
 '''
 
-# Public Debt issuance, DTS 자료를 json 포맷으로 다운 받습니다.
-
-# 미국 국채 일별 발행 자료입니다.
+# Public Debt issuance, DTS 갸운데
+# Public Debt Transactions
+# 테이블
+# 자료를 json 포맷으로 다운 받습니다.
+# 미국 국채 일별 발행 자료가 들어있는데 이를 parsing 하는 함수입니다.
 
 # 저장해 둔 json file을 parsing 하는 함수가 시작됩니다.
 # start_date, end_date, json_path는 원 코드에서 이 함수를 호술할 때 넣어줍니다.
@@ -144,8 +146,10 @@ def fetch_debt_issues_json(start_date, end_date, json_path):
     return monthly_issues, monthly_redemptions, monthly_total, net, yearly_net, issues
 
 
-# Public Debt Outstanding, Monthly Statement of the Public Debt
-# 에서 받아놓은 jason file에서 parsing 합니다.
+#Public Debt Outstanding 금액을 월별, 국채 종류별로 리턴합니다.
+#Monthly Statement of the Public Debt dataset 가운데
+#Summary of Public Debt Outstanding 테이블 자료를 json 포맷으로 다운받습니다.
+#받아놓은 jason file에서 parsing 합니다.
 
 
 def fetch_debt_outstanding_json(start_date, end_date, json_path):

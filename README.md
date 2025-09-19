@@ -101,7 +101,7 @@ for peak, trough in recession_periods:
     ax.axvspan(peak, trough, color='gray', alpha=0.3)
   
 
-#### plot_save(i=None):  
+#### plot_save(i=None)  
 
 그래프를 파일로 저장하는 함수입니다.
 그래프를 그리는 코드의 이름을 파일 이름으로 사용합니다.
@@ -118,8 +118,26 @@ plot_save()
 그림이 여러개 일 경우   
 plot_save(i=i)  
   
+### treasury_api.py
 
+Treasury Fiscal Data-DTS, MSPD 홈페이지에서 json 파일을 직접
+다운로드 한 다음, parsing 하는 함수가 들어있습니다.
 
+#### fetch_debt_issues_json()
+
+Public Debt issuance, redemption, net issues를 리턴합니다.
+DTS dataset 가운데
+Public Debt Transactions 
+테이블
+자료를 json 포맷으로 다운 받습니다.
+미국 국채 일별 발행 자료가 들어있는데 이를 parsing 하는 함수입니다.
+
+#### fetch_debt_outstanding_json()
+
+Public Debt Outstanding 금액을 월별 국채종류별로 리턴합니다.
+Monthly Statement of the Public Debt dataset 가운데
+Summary of Public Debt Outstanding 테이블 자료를 json 포맷으로 다운받습니다.
+받아놓은 jason file에서 parsing 합니다.
 
 
 
