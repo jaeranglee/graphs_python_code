@@ -37,9 +37,15 @@ fetch_fred_series() 함수와 yfinance package가 이용됩니다.
 그래프를 그리게 됩니다.
 그림을 정해진 규칙의 이름으로 저장하는 함수도 있습니다.
 
+### bok_ecos_api.py
+
+한국은행 경제통계시스템, ECOS에서 자료를 불러옵니다.
+##### fetch_ecos_series(name, stat_code, item_code, cycle, start_date=start, end_date=end)
+stat_code, item_code, cycle은 ECOS가 정한 id로 적어야 합니다.
+
 ### fred_api.py
 
-fetch_fred_series()가 정의된 곳입니다.
+fetch_fred_series()가 정의된 파일 입니다.
 St. Louise Fed FRED Open API에서 자료를 fetch 합니다.
 
 ### imf_api.py
@@ -62,11 +68,15 @@ IMF Dataset의 날짜 형식을 FRED 날짜형식으로 전환하는 함수입�
 분석에 이용하는 것이 좋습니다. 1990년 vintage부터 불러오기 때문에 코드 실행후 완료까지 5분이상 소요됩니다.
 
 ### nyfed_api_all_rates.py
-fetch_all_secured_rates()가 정의된 곳입니다. 뉴욕 연준에서 아래의 자룔를 fetch합니다.
+fetch_all_secured_rates()가 정의된 곳 입니다. 뉴욕 연준에서 아래의 자룔를 fetch합니다.
 New York Fed Markets Data, Reference Rates, Secured Rates, rates and percentile
 
+### nyfed_ap_rp.py
+fetch_rp_operations()가 정의된 파일 입니다.
+
+
 ### nyfed_api_vol_rate.py
-fetch_secured_series()가 정의된 곳입니다.
+fetch_secured_series()가 정의된 파일 입니다.
 New York Fed Markets Data API에서 secured volume 또는 rate(1일물 증권담보대출금리 거래의 거래량)을 fetch합니다. 
 parameter에서 "type":을 'volume'과 'rate' 가운데 하나를 선택합니다. 
 "rate_type"으로 all, tgcr, bgcr, sofr, sofrai 가운데 하나를 입력합니다. all은 모든 자료를 호출합니다.
@@ -139,5 +149,19 @@ Monthly Statement of the Public Debt dataset 가운데
 Summary of Public Debt Outstanding 테이블 자료를 json 포맷으로 다운받습니다.
 받아놓은 jason file에서 parsing 합니다.
 
+### treasury_buy_backs_api.py
 
+Treasury Fiscal Data, Treasury Buybacks data fetch
+#### fetch_buybacks(start_date, end_date):
+
+### treasury_tic_api.py
+
+Treasury International Capital (TIC) System data parsing
+
+파일이 없거나 강제로 업데이트할 때, force_update=True 일 때만 다운로드 합니다.
+
+#### download_tic_holdings_soup(file_path, force_update=False):
+#### download_tic_holdings_html(file_path, force_update=False):
+#### download_tic_sales_soup(file_path, force_update=False):
+#### download_tic_sales_html(file_path, force_update=False):
 

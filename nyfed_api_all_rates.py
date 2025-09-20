@@ -34,14 +34,16 @@ def fetch_all_secured_rates(start_date, end_date, rate_type_filter=None):
     params = {
         "startDate": start_date,
         "endDate": end_date,
-        "type": rate_type_filter if isinstance(rate_type_filter, str) else None
+        "type": rate_type_filter #if isinstance(rate_type_filter, str) else None
     }
 
     response = requests.get(url, params=params)
+
     if response.status_code != 200:
-        raise RuntimeError(f"❌ Failed to fetch all rates: {response.status_code}\n{response.text}")
+        raise RuntimeError(f"Failed to fetch all rates: {response.status_code}\n{response.text}")
 
     data = response.json()
+
     df = pd.DataFrame(data.get("refRates", []))
 
     if df.empty:
