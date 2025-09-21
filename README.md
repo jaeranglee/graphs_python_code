@@ -140,13 +140,13 @@ df = fetch_all_secured_rates(start_date=start, end_date=end, rate_type_filter=No
 #### Return
 pd.DataFrame with datatime 'Date', and other columns.
 ```python
-columns={
+df = df.rename(columns={
         "type": "Type",
         "percentRate": "Rate",
         "percentPercentile1": "Percentile1",
         "percentPercentile25": "Percentile25",
         "percentPercentile75": "Percentile75",
-        "percentPercentile99": "Percentile99"}
+        "percentPercentile99": "Percentile99"})
 ```
 
 
@@ -161,14 +161,14 @@ df = fetch_rp_operation(start_date=start, end_date=end)
 #### Return
 pd.DataFrame with datatime 'Date', and other columns.
 ```python
-columns= {"operationDate", "operationLimit", "totalAmtSubmitted", "totalAmtAccepted", "operationType"]].rename(columns={
+df = df.rename(columns= {"operationDate", "operationLimit", "totalAmtSubmitted", "totalAmtAccepted", "operationType"]].rename(columns={
         "operationDate": "Date",
         "operationLimit": "Limit",
         "totalAmtSubmitted": "Sumbitted",
         "totalAmtAccepted": "Accepted",
         "operationType": "Type",
         "term": 'Term'
-        }
+        })
 ```
 
 ### nyfed_api_rate_volume.py
@@ -187,10 +187,10 @@ df = fetch_all_secured_rates_vol(start_date=start, end_date=end, , rate_type_fil
 #### Return
 pd.DataFrame with datatime 'Date', and other columns.
 ```python
-columns={
+df = df.rename(columns={
         "type": "Type",
         "volumeInBillions": 'Volume'
-    }
+    })
 ```
 
 ### nyfed_rrp_vol.py
