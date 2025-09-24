@@ -49,7 +49,7 @@ def set_fonts():
 from fred_api import fetch_fred_series
 
 # USREC 기준으로 recession 음영 처리 (확장기: 0, 침체기: 1)
-def nber_recesssion(start, end):
+def nber_recession(start, end):
 
     # USREC 데이터 불러오기
     df_usrec = fetch_fred_series('USREC',start_date=start, end_date=end)

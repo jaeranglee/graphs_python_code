@@ -353,4 +353,3 @@ df1=download_tic_holdings_html(file_path=path, force_update=False)
 df2=download_tic_sales_soup(file_path=path, force_update=False)
 df3=download_tic_sales_html(file_path=path, force_update=False)
 ```
-
