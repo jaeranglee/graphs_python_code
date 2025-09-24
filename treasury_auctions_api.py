@@ -1,3 +1,15 @@
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     formats: ipynb,py:percent
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.17.3
+# ---
+
 # %% [markdown]
 # 미국 재무부 Fiscal Data API에서 Treasury Securities Auctions data를 가져와서 파일로 저장하는 코드를 살펴보자.
 # 다른 곳에서 설명한 것은 제외하고 특징적인 사항위주로 설명하였다.
@@ -32,7 +44,7 @@ def fetch_securities_auction(start_date, end_date):
 # 자료를 가져오면, 2페이지로 끝난다.
 # json 포맷으로 자료를 가저오며,
 # 호출이 끝나면 자동으로 dataframe 형식으로 전환한다.
-# %%
+    # %%
     params = {
 
         'filter': f'record_date:gte:{start_date},record_date:lte:{end_date}',
@@ -78,7 +90,7 @@ def fetch_securities_auction(start_date, end_date):
 # %% [markdown]
 # 자료호출이 끝나면 자료의 처음 5개를 화면에 출력하고 자료를 csv파일로 저장한다.
 # 현재는 csv 파일만 return 하도록 했는데, df를 return해도 된다.
-# %%
+        # %%
         print(df.head())
 
         os.makedirs("data", exist_ok=True)

@@ -1,3 +1,15 @@
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     formats: ipynb,py:percent
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.17.3
+# ---
+
 # %% [markdown]
 # ## [그림 27] Bid to cover ratio
 # ## 같은 디렉토리에 필요한 file
