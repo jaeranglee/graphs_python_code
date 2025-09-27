@@ -30,7 +30,7 @@ bal2 = bal[bal['observation_date'] >= '1997-01-01'].copy()
 
 
 # NBER Recession from plot_def.py
-recession_periods = nber_recesssion(start=start, end=end)
+recession_periods = nber_recession(start=start, end=end)
 
 
 
