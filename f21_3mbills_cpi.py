@@ -70,7 +70,7 @@ ax[1].text(0.0, -0.15, "출처: FRED, 음영은 경기침체 기간", transform=
 ax[1].grid(False)
 
 # recession 기간표시
-recession_periods = nber_recesssion(start=start, end=end)
+recession_periods = nber_recession(start=start, end=end)
 
 # 두 그래프에 음영 처리
 for peak, trough in recession_periods:
