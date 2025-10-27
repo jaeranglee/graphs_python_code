@@ -52,7 +52,7 @@ import pandas as pd
 # 🔑 Load API key
 load_dotenv()
 #API_KEY_ECOS = os.getenv("ECOS_API_KEY")
-API_KEY_ECOS = "HP80FXOW6VNZ6PP270RZ"
+API_KEY_ECOS = "YOUR KEY HERE"
 
 # %% [markdown]
 # ## ECOS date 형식대신 "%Y-%m-%d" 형식으로 입력할 수 있는 루틴
