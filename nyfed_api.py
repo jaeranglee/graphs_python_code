@@ -1,42 +1,38 @@
-# New York Fed Markets Data 에서 시계열 데이터를 받아 pandas DataFrame으로 반환
-
-# f_bank_reserves_sofr_iorb.py 에서 사용
-# 아래와 같은 식으로 파라미터 입력 하여 사용
-#=======================================
-
-# 함수 호출
+# %% [markdown]
+# # New York Fed Markets Data API
+# ## file name
+# - nyfed_api.py
+# ## fetch_secured-rate()
+# ```python
 # from nyfed_api import fetch_secured_rate
-
-# 사용자 정의 기간
-#start = "2023-01-01"
-#end = "2025-12-31"
-
-# Fetch series
-# 사용자 정의 데이터 시리즈 호출 secured rate['tgcr', 'sofr', 'bgcr']
 #
-
-# dftr = fetch_secured_rate("tgcr", start_date=start, end_date=end)
-
-
-
+# start = "2023-01-01"
+# end = "2025-12-31"
+#
+# dftr = fetch_secured_rate(rate_type = "tgcr", start_date=start, end_date=end)
+# ```
+#
+# ## parameters
+# | Parameter    | Type  | Description                               |
+# |--------------|-------|-------------------------------------------|
+# | `rate_type`  | `str` | available options ['tgcr','sofr','bgcr']  |
+# | `start_date` | `str` | start date, 'YYYY-MM-DD'                  |
+# | `end_date`   | `str` | end date, 'YYYY-MM-DD'                    |
+#
+# ## returned columns and values
+# df[["effectiveDate", "percentRate"]].rename(columns={
+#         "effectiveDate": "Date",
+#         "percentRate": rate_type.upper()
+# %%
+#%config InlineBackend.close_figures = False
 import requests
 import pandas as pd
 import os
 
 from fred_api import fetch_fred_series
 
-def fetch_secured_rate(rate_type="tgcr", start_date="2000-01-01", end_date="2025-12-31"):
-    """
-    NY Fed secured rate (TGCR, SOFR, BGCR 등)를 가져오는 함수.
+def fetch_secured_rate(rate_type, start_date, end_date):
 
-    Parameters:
-        rate_type (str): 'tgcr', 'sofr', or 'bgcr'
-        start_date (str): 'YYYY-MM-DD'
-        end_date (str): 'YYYY-MM-DD'
-
-    Returns:
-        pd.DataFrame: [Date, Rate] 형식의 DataFrame
-    """
     rate_type = rate_type.lower()
     url = f"https://markets.newyorkfed.org/api/rates/secured/{rate_type}/search.json"
 
@@ -65,29 +61,16 @@ def fetch_secured_rate(rate_type="tgcr", start_date="2000-01-01", end_date="2025
 
     return df
 
-#---------------------
-
-
-
-
+# %% [markdown]
+# ## sub function for fetching soma holdings
+# NY Fed SOMA holdings에 asOfDates 를 가져오는 함수
+# %%
 
 def fetch_soma_holdings_asofdates():
-    """
-    NY Fed SOMA holdings에 asOfDates 를 가져오는 함수
-
-    Parameters:
-
-        start_date (str): 'YYYY-MM-DD'
-        end_date (str): 'YYYY-MM-DD'
-
-    Returns:
-        pd.DataFrame: [Date, 증권 종류 ] 형식의 DataFrame
-    """
 
     url = f"https://markets.newyorkfed.org/api/soma/asofdates/list.json"
 
     params = {
-
     }
 
     response = requests.get(url, params=params)
@@ -96,9 +79,6 @@ def fetch_soma_holdings_asofdates():
         raise RuntimeError(f"❌ Failed to fetch all rates: {response.status_code}\n{response.text}")
 
     data = response.json()
-
-
-    #days = pd.DataFrame(data.get("soma", {}).get("asOfDates", []))
     days = data.get("soma", {}).get("asOfDates", [])
 
     return days
@@ -107,19 +87,12 @@ start = fetch_soma_holdings_asofdates()[-1]
 end = fetch_soma_holdings_asofdates()[0]
 
 
-def fetch_soma_holdings(start_date=start, end_date=end):
+# %% [markdown]
+# ## fetch_soma_holdings()
+# NY Fed SOMA holdings value를 가져오는 함수
+# %%
 
-    """
-    NY Fed SOMA holdings를 가져오는 함수.
-
-    Parameters:
-
-        start_date (str): 'YYYY-MM-DD'
-        end_date (str): 'YYYY-MM-DD'
-
-    Returns:
-        pd.DataFrame: [Date, 증권 종류 ] 형식의 DataFrame
-    """
+def fetch_soma_holdings(start_date, end_date):
 
     url = f"https://markets.newyorkfed.org/api/soma/summary.json"
 
@@ -137,7 +110,8 @@ def fetch_soma_holdings(start_date=start, end_date=end):
 
     df = pd.DataFrame(data.get("soma", {}).get("summary", []))
 
-    df["Date"] = pd.to_datetime(df["asOfDate"])
+    # rename 'Date' column to 'observation_date' to match FRED convention
+    df = df.rename(columns={"asOfDate": "observation_date"})
 
     rename_dict = {
         "mbs": "MBS",
@@ -153,7 +127,7 @@ def fetch_soma_holdings(start_date=start, end_date=end):
 
     # Rename columns
     df = df.rename(columns=rename_dict)
-
+    print(df)
     # Convert renamed columns to numeric
     for _, new_col in rename_dict.items():
 
@@ -163,15 +137,12 @@ def fetch_soma_holdings(start_date=start, end_date=end):
         df[new_col] = pd.to_numeric(df[new_col], errors='coerce') / 1e6
 
 
-    df = df[(df['Date']>=start_date) & (df['Date']<=end_date)]
+    df = df[(df['observation_date']>=start_date) & (df['observation_date']<=end_date)]
 
-    # rename 'Date' column to 'observation_date' to match FRED convention
-
-    df = df.rename(columns={'Date': 'observation_date'})
     df.reset_index(drop=True, inplace=True)
     df['observation_date'] = pd.to_datetime(df['observation_date'])
 
-# fetch TGA from FRED api and merge with df
+    # fetch TGA from FRED api and merge with df
     df1= fetch_fred_series(start_date=start, end_date=end, series_id="WDTGAL")
 
     df1.rename(columns={'WDTGAL': 'TGA'}, inplace=True)
@@ -245,5 +216,3 @@ def fetch_pdpositions(save_path="data/TimeSeries.csv"):
         f.write(response.content)
 
     return save_path
-
-fetch_pdpositions()

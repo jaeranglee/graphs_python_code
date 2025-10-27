@@ -1,13 +1,14 @@
+# %% [markdown]
+# # Toreign US Treasury Holdings 데이터 가져오기
+# ## TIC, table 5, foreign holdings
+# requests, BeautifulSoup 이용
+# 개인컴만 가능
+# %%
+#%config InlineBackend.close_figures = False
 import os
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-
-##---------------------------------------------
-## Foreign US Treasury Holdings 데이터 가져오기
-## requests, BeautifulSoup 이용
-## 개인컴만 가능
-##---------------------------------------------
 
 def download_tic_holdings_soup(file_path, force_update=False):
     # 파일이 없거나 강제로 업데이트할 때만 다운로드
@@ -39,13 +40,13 @@ def download_tic_holdings_soup(file_path, force_update=False):
     # 공통 부분
     return pd.ExcelFile(file_path, engine='openpyxl')
 
-##---------------------------------------------
-## Foreign US Treasury holdings 데이터 가져오기
-## pd.read_html 이용
-## 회사컴만 가능
-## 여러번 수행하면 시간이 걸리기 때문에 엑셀로 저장하여 반복 이용
-## 수동으로 excel로 저장해도 됨
-##---------------------------------------------
+# %% [markdown]
+# ## TIC, table 5, foreign holdings
+# read_html 이용
+# 회사컴만 가능,
+# 여러번 수행하면 시간이 걸리기 때문에 엑셀로 저장하여 반복 이용,
+# 수동으로 excel로 저장해도 됨
+# %%
 def download_tic_holdings_html(file_path, force_update=False):
     # 파일이 없거나 강제로 업데이트할 때만 다운로드
     if not os.path.exists(file_path) or force_update:
@@ -67,15 +68,10 @@ def download_tic_holdings_html(file_path, force_update=False):
     # 공통 부분
     return pd.ExcelFile(file_path, engine='openpyxl')
 
-##---------------------------------------------
-
-
-
-##---------------------------------------------
-## Net US Long Term Securities Sales 데이터 가져오기
-
-## TIC data fetch with beautiful soup
-##---------------------------------------------
+# %% [markdown]
+# # TIC, table 1, Net US Long Term Securities Sales 데이터 가져오기
+# ## TIC data fetch with beautiful soup
+# %%
 def download_tic_sales_soup(file_path, force_update=False):
     # 파일이 없거나 강제로 업데이트할 때만 다운로드
     if not os.path.exists(file_path) or force_update:
@@ -108,21 +104,19 @@ def download_tic_sales_soup(file_path, force_update=False):
     # 공통 부분
     return pd.ExcelFile(file_path)
 
-# ------------------------------
-# 실행 예시
-# ------------------------------
+# %% [markdown]
+# ## Net US Long Term Securities Sales, table 1 데이터 가져오기
+# 미리 다운로드 받거나 read_html을 긁어와서 이용,
+# 회사컴만 가능
+# ## Example
+# ```python
 # 1) 파일 없으면 다운로드, 있으면 캐시 사용
 # excel_data = download_tic_data(file_path1)
-
+#
 # 2) 무조건 업데이트하고 싶을 때
 # excel_data = download_tic_data(file_path1, force_update=True)
-
-
-##---------------------------------------------
-## Net US Long Term Securities Sales 데이터 가져오기
-## read_html 이용
-## 회사컴만 가능
-##---------------------------------------------
+#```
+# %%
 def download_tic_sales_html(file_path, force_update=False):
     if not os.path.exists(file_path) or force_update:
         # 데이터가 있는 URL
@@ -141,5 +135,5 @@ def download_tic_sales_html(file_path, force_update=False):
         # 엑셀 파일로 저장
         print("Using cached file:", file_path)
     return pd.ExcelFile(file_path)
-##---------------------------------------------
+
 

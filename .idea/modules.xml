@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../gold/.idea/gold.iml" filepath="$PROJECT_DIR$/../gold/.idea/gold.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/graphs_python_code.iml" filepath="$PROJECT_DIR$/.idea/graphs_python_code.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../sample_code/.idea/sample_code.iml" filepath="$PROJECT_DIR$/../sample_code/.idea/sample_code.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../wallstreet/.idea/wallstreet.iml" filepath="$PROJECT_DIR$/../wallstreet/.idea/wallstreet.iml" />
     </modules>
   </component>
 </project>

@@ -1,9 +1,32 @@
+# %% [markdown]
+# # US Federal Government Debt Limit and Total Debt
+# ## DTS, Debt Subject to Limit table API
+# ## file name
+# treasury_debt_limit_api.py
+#
+# ## parameters
+# | Parameter    | Type  | Description                               |
+# |--------------|-------|-------------------------------------------|
+# | `start_date` | `str` | start date, 'YYYY-MM-DD'                  |
+# | `end_date`   | `str` | end date, 'YYYY-MM-DD'                    |
+# ## Returns
+# ```python
+# df = df.rename(columns={
+#         "record_date": "Record Date",
+#         "debt_catg": "Debt Category",
+#         "close_today_bal": "Closing Balance Today",
+#     })
+# ```
+# ## Example
+# ```python
+# print(fetch_debt_limit().info())
+# ```
+# %%
+#%config InlineBackend.close_figures = False
 import requests
 import pandas as pd
 import platform
 import json
-
-
 
 def fetch_debt_limit(start_date, end_date):
     """
@@ -40,7 +63,6 @@ def fetch_debt_limit(start_date, end_date):
 
     df = pd.DataFrame(all_data)
 
-
     df["record_date"] = pd.to_datetime(df["record_date"])
     df = df.rename(columns={
         "record_date": "Record Date",
@@ -52,13 +74,22 @@ def fetch_debt_limit(start_date, end_date):
 
     return df
 
-#Test
-#print(fetch_debt_limit().info())
-
-
-#--------
-#데이터를 한번에 json 으로 받은 다음 \data 디렉토리에 저장후 추출
+# %% [markdown]
+# 데이터를 한번에 json 으로 받은 다음 \data 디렉토리에 저장후 추출
 # fetch_debt_limit 으로 받으면 여러 번 나눠 받기 때문에 시간이 오래 걸림
+# ## parameters
+# | Parameter    | Type  | Description                               |
+# |--------------|-------|-------------------------------------------|
+# | `start_date` | `str` | start date, 'YYYY-MM-DD'                  |
+# | `end_date`   | `str` | end date, 'YYYY-MM-DD'                    |
+# | `base_url`   | `str` | file path and downloaded json file name   |
+# ## Returns
+#  df=df[['Record Date', 'Debt Category', 'Closing Balance Today']]
+# ## Example
+# ```phyton
+# print(fetch_debt_limit_json().info())
+# ```
+# %%
 
 def fetch_debt_limit_json(start_date, end_date, base_url):
 
@@ -81,14 +112,14 @@ def fetch_debt_limit_json(start_date, end_date, base_url):
     df=df[['Record Date', 'Debt Category', 'Closing Balance Today']]
     return df
 
-#Test
-#print(fetch_debt_limit_json().info())
-
-
-
-#-------------------
-# 정부부채
-# cvs 파일로 저장했을 때 불러오는 루틴
+# %% [markdown]
+# 데이터를 한번에 csv 로 받은 다음 \data 디렉토리에 저장후 추출
+# fetch_debt_limit 으로 받으면 여러 번 나눠 받기 때문에 시간이 오래 걸림
+# ## Example
+# ```phyton
+# print(fetch_debt_limit_csv().info())
+# ```
+# %%
 
 def fetch_debt_limit_cvs(start_date, end_date,
                          file_path):
@@ -105,8 +136,7 @@ def fetch_debt_limit_cvs(start_date, end_date,
 
     return df
 
-#Test
-#print(fetch_debt_limit_cvs())
+
 
 
 

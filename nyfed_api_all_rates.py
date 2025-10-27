@@ -1,35 +1,34 @@
-# New York Fed Markets Data 에서 시계열 데이터를 받아 pandas DataFrame으로 반환
-
-# 아래와 같은 식으로 파라미터 입력 하여 사용
-#=======================================
-# New York Fed Markets Data API 에서 자료 추출
-# nyfed_api_all_rates.py로 만든 def 호출
-
+# %% [markdown]
+# # New York Fed Markets Data API
+# ## file name
+# - nyfed_api_all_rates.py
+# ## example
+# ```python
 # from nyfed_api_all_rates import fetch_all_secured_rates
+#
 # df_all = fetch_all_secured_rates(start_date=start, end_date=end)
-
-# tgcr, sofr, bgcr, sofrai, effr, obfr 등 선택가능
+#
 # rate_type_filter = "tgcr"
-
 # dftr = df_all[df_all["Type"] == rate_type_filter.upper()].copy()
-
-
+# ```
+#
+# ## parameters
+# | Parameter    | Type  | Description                               |
+# |--------------|-------|-------------------------------------------|
+# | `start_date` | `str` | start date, 'YYYY-MM-DD'                  |
+# | `end_date`   | `str` | end date, 'YYYY-MM-DD'                    |
+#
+# ## "Type" in returned df
+# - 'tgcr', 'sofr', 'bgcr', 'sofrai', 'effr', 'obfr'
+# ## returned columns and values
+# - df["Date", "Type", "Rate", "Percentile1", "Percentile25",
+# "Percentile75", "Percentile99"]
+# %%
 import requests
 import pandas as pd
 
-
 def fetch_all_secured_rates(start_date, end_date, rate_type_filter=None):
-    """
-    NY Fed에서 제공하는 모든 secured rates (TGCR, SOFR, BGCR 등)를 호출하는 함수.
 
-    Parameters:
-        start_date (str): 조회 시작일 (YYYY-MM-DD)
-        end_date (str): 조회 종료일 (YYYY-MM-DD)
-        rate_type_filter (str or list): "tgcr", "sofr", "bcgr" 중 필터링할 금리 유형 (선택사항)
-
-    Returns:
-        pd.DataFrame: 날짜, 금리 유형(type), 금리(percentRate), 분위(percentiles) 포함된 DataFrame
-    """
     url = "https://markets.newyorkfed.org/api/rates/all/search.json"
     params = {
         "startDate": start_date,
@@ -51,7 +50,6 @@ def fetch_all_secured_rates(start_date, end_date, rate_type_filter=None):
             "Date", f"{rate_type_filter.upper()}", "Rate", "Percentile1", "Percentile25", "Percentile75", "Percentile99"
         ])
 
-    # 컬럼 정리 및 변환
     df["Date"] = pd.to_datetime(df["effectiveDate"])
     df = df.rename(columns={
         "type": "Type",

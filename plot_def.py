@@ -1,37 +1,39 @@
+# %% [markdown]
 # 그래프와 관련된 함수입니다.
-
-# nber_recession(start, end)
-# 그래프에 미국의 경기침체기(NBER 기준)를 음영으로 넣어주는 함수
-# 입력 파라미터 start, end가 반드시 있어야 합니다.
-# 자료 시작일 start, 자료 종료일 end 날짜를 그래프와 같게 하여야 합니다.
-
-# 다음과 같은 코드를 원하는 plot line 아래에 넣어야 합니다.
-
+#
+# - nber_recession(start, end)
+#   - 그래프에 미국의 경기침체기(NBER 기준)를 음영으로 넣어주는 함수
+#   - 입력 파라미터 start, end가 반드시 있어야 합니다.
+#   - 자료 시작일 start, 자료 종료일 end 날짜를 그래프와 같게 하여야 합니다.
+#   - 다음과 같은 코드를 원하는 plot line 아래에 넣어야 합니다.
+# ```python
 # for peak, trough in recession_periods:
 #    ax.axvspan(peak, trough, color='gray', alpha=0.3)
-
-
-# def plot_save(i=None):
-
-# 그래프를 파일로 저장하는 함수
-# 그래프를 그리는 코드의 이름을 파일 이름으로 사용합니다.
-# 현재보다 하위에 있는 'pic_jpg' 디렉토리에 '파일이름.jpg, 그리고
-# 'pic_tif' 디렉토리에 '파일이름.tif'파일로 저장합니다.
-# 입력 파라미터 i는 그림의 번호입니다.
-# 그림을 한 개만 그리는 코드에는 i 값을 지정하지 않아도 됩니다.
-# for 루프로 그림을 여러개 그리는 코드에는 코드의 루핑 횟수 값 지징변수를 가져와서 넣어야
-# 그림별로 다른 파일로 저장됩니다.
-
-# 그림이 한개 일 때
-# plot_save()
-
-# 그림이 여러개 일 경우
-# plot_save(i=i)
-
-
-
+# ```
+# - def plot_save(i=None):
+#   - 그래프를 파일로 저장하는 함수
+#   - 그래프를 그리는 코드의 이름을 파일 이름으로 사용합니다.
+#   - 현재보다 하위에 있는 'pic_jpg' 디렉토리에 '파일이름.jpg, 그리고
+#   - 'pic_tif' 디렉토리에 '파일이름.tif'파일로 저장합니다.
+#   - 입력 파라미터 i는 그림의 번호입니다.
+#   - 그림을 한 개만 그리는 코드에는 i 값을 지정하지 않아도 됩니다.
+#   - for 루프로 그림을 여러개 그리는 코드에는 코드의 루핑 횟수 값 지징변수를 가져와서 넣어야
+#   - 그림별로 다른 파일로 저장됩니다.
+#   - 그림이 한개 일 때
+#       - plot_save()
+#   - 그림이 여러개 일 경우
+#       - plot_save(i=i)
+# %%
+#%matplotlib inline
+#%config InlineBackend.close_figures = False
+#%time plot_save()
+import pandas as pd
 import matplotlib.pyplot as plt
 import platform
+from matplotlib.ticker import StrMethodFormatter
+from matplotlib.ticker import FuncFormatter
+import matplotlib.dates as mdates
+from datetime import date
 
 # fonts 설정
 
@@ -127,4 +129,3 @@ def plot_save(i=None):
     img = Image.open(image_path_jpg).convert("CMYK")
     img.save(image_path_jpg, "JPEG")
     plt.show()
-

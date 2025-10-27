@@ -1,15 +1,3 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.17.3
-# ---
-
 # %% [markdown]
 # 미국 재무부 Fiscal Data API에서 Treasury Securities Auctions data를 가져와서 파일로 저장하는 코드를 살펴보자.
 # 다른 곳에서 설명한 것은 제외하고 특징적인 사항위주로 설명하였다.
@@ -18,7 +6,7 @@
 # 아래 코드가 '[그림 26] 월별 미국 국채 경매규모'에 활용되었다.
 # 먼저 필요한 패키지를 호출한다.
 # %%
-
+#%config InlineBackend.close_figures = False
 import requests
 import pandas as pd
 import os

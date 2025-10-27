@@ -1,7 +1,8 @@
+# %% [markdown]
 # NPF 수정 데이터를 불러와서 csv 파일로 저장하는 코드
+#
 # "data/nfp_revisions.csv" 이렇게 저장됨
-
-
+# %%
 import pandas as pd
 import requests
 import time
@@ -9,7 +10,6 @@ import os
 
 from dateutil.relativedelta import relativedelta
 from dotenv import load_dotenv
-
 
 # Load your FRED API key from .env
 load_dotenv()

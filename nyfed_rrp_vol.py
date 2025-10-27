@@ -1,19 +1,18 @@
-'''
-NY FED Markets Data 가운데 뉴욕 연준의 RP 거래와 RRP 경매결과 자료를 가져오는 코드를 소개한다.
-이 코드는 nyfed_api_rrp_vol.py라는 파일로 저장해 놓았고 함수의 이름은 fetch_rrp_vol()이다.
-'[그림 10] MMF의 RRP와 TGCR 거래 규모'를 그릴 때 이 함수로 자료를 호출했다.
-[그림 10]을 그려주는 코드는 f10_tgcr_vol.py이다.
-//
-지금부터 nyfed_api_rrp_vol.py 코드의 내용을 개략적으로 소개한다.
-NY FED Markets Data의 API는 자료마다 endpoint가 다르고 json 형식도 약간씩 다르다. 그래서 다른 함수로 정의한 것이다.
-Markets Data API 웹페이지에 데이터 별 endpoint와 필요한 parameter, 형식 등이 잘 정리되어 있으니 참고하면 된다.
-앞의 내용과 중복되는 부분은 설명을 생략하였다.
-//
-특징적인 부분은 다음과 같다. endpoint url이 달라졌다. 들어가는 parameter도 rate volume을 호출하는 API와 다르다.
-json 포맷으로 불러오는 데이터의 구조가 다층구조로 바뀌었다. "repo", {} 형식의 상위구조 아래,
-"operations", []로 된 하위구조의 자료를 가져온다.
-'''
-
+# %% [markdown]
+# NY FED Markets Data 가운데 뉴욕 연준의 RP 거래와 RRP 경매결과 자료를 가져오는 코드를 소개한다.
+# 이 코드는 nyfed_api_rrp_vol.py라는 파일로 저장해 놓았고 함수의 이름은 fetch_rrp_vol()이다.
+# '[그림 10] MMF의 RRP와 TGCR 거래 규모'를 그릴 때 이 함수로 자료를 호출했다.
+# [그림 10]을 그려주는 코드는 f10_tgcr_vol.py이다.
+#
+# 지금부터 nyfed_api_rrp_vol.py 코드의 내용을 개략적으로 소개한다.
+# NY FED Markets Data의 API는 자료마다 endpoint가 다르고 json 형식도 약간씩 다르다. 그래서 다른 함수로 정의한 것이다.
+# Markets Data API 웹페이지에 데이터 별 endpoint와 필요한 parameter, 형식 등이 잘 정리되어 있으니 참고하면 된다.
+# 앞의 내용과 중복되는 부분은 설명을 생략하였다.
+#
+# 특징적인 부분은 다음과 같다. endpoint url이 달라졌다. 들어가는 parameter도 rate volume을 호출하는 API와 다르다.
+# json 포맷으로 불러오는 데이터의 구조가 다층구조로 바뀌었다. "repo", {} 형식의 상위구조 아래,
+# "operations", []로 된 하위구조의 자료를 가져온다.
+# %%
 import requests
 import pandas as pd
 
@@ -82,40 +81,38 @@ def fetch_rrp_vol(start_date, end_date):
         propositions_df["Date"] = pd.to_datetime(
                                         propositions_df["Date"])
     return df, propositions_df
-
-'''
-확인을 위해 총액을 보여주는 첫 번째 자료를 df_total로 할당하고 csv파일로 저장했다. 
-양이 많아서 파일의 내용은 수록하지 않았다. 
-Type 가운데 RRP의 낙찰총액, Total Volume을 [그림10]에 이용했다. 
-두 번째 자료는 낙찰기관 타입별 자료이며 화면에 결과를 출력했다. 
-Counter Party 가운데 mmf의 낙찰규모를 [그림 10]에 이용했다.
-//
-'''
-
-df_total = fetch_rrp_vol(start_date="2024-01-01",
-                         end_date='2024-02-01')[0]
-df_total.to_csv("total.csv", index=False)
-df_cpt = fetch_rrp_vol(start_date="2024-01-01",
-                       end_date='2024-02-01')[1]
-print(df_cpt)
-
-'''
-   Counterparty Type  Amount Accepted       Date///
-0               bank                0 2024-02-01///
-1                gse      25855000000 2024-02-01///
-2                mmf     477693000000 2024-02-01///
-3                 pd                0 2024-02-01///
-4               bank                0 2024-01-31///
-..               ...              ...        ...///
-83                pd                0 2024-01-03///
-84              bank                0 2024-01-02///
-85               gse      27250000000 2024-01-02///
-86               mmf     677614000000 2024-01-02///
-87                pd                0 2024-01-02///
-                                                ///
-[88 rows x 3 columns]///
-//
-'''
+# %% [markdown]
+# 확인을 위해 총액을 보여주는 첫 번째 자료를 df_total로 할당하고 csv파일로 저장했다.
+# 양이 많아서 파일의 내용은 수록하지 않았다.
+#
+# Type 가운데 RRP의 낙찰총액, Total Volume을 [그림10]에 이용했다.
+# 두 번째 자료는 낙찰기관 타입별 자료이며 화면에 결과를 출력했다.
+# Counter Party 가운데 mmf의 낙찰규모를 [그림 10]에 이용했다.
+# ```python
+#
+# df_total = fetch_rrp_vol(start_date="2024-01-01",
+#                          end_date='2024-02-01')[0]
+# df_total.to_csv("total.csv", index=False)
+# df_cpt = fetch_rrp_vol(start_date="2024-01-01",
+#                        end_date='2024-02-01')[1]
+# print(df_cpt)
+#
+#    Counterparty Type  Amount Accepted       Date
+# 0               bank                0 2024-02-01
+# 1                gse      25855000000 2024-02-01
+# 2                mmf     477693000000 2024-02-01
+# 3                 pd                0 2024-02-01
+# 4               bank                0 2024-01-31
+# ..               ...              ...        ...
+# 83                pd                0 2024-01-03
+# 84              bank                0 2024-01-02
+# 85               gse      27250000000 2024-01-02
+# 86               mmf     677614000000 2024-01-02
+# 87                pd                0 2024-01-02
+#
+# [88 rows x 3 columns]
+# ```
+# %%
 
 
 
