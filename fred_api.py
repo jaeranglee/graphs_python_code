@@ -27,8 +27,8 @@ import pandas as pd
 # %%
 from dotenv import load_dotenv
 load_dotenv()
-#api_key = os.getenv("FRED_API_KEY")
-api_key ='YOUR KEY HERE'
+api_key = os.getenv("FRED_API_KEY")
+#api_key ='YOUR KEY HERE'
 # %% [markdown]
 # FRED에서 시계열 데이터를 받아 pandas DataFrame으로 반환하는 함수이다.
 # 필요한 파라미터 3개를 넣어야 한다. series_id는 가져오려는 시계열 자료의 ID이다.

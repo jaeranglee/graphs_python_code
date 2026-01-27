@@ -1,52 +1,76 @@
 # %% [markdown]
 # 그래프와 관련된 함수입니다.
 #
-# - nber_recession(start, end)
-#   - 그래프에 미국의 경기침체기(NBER 기준)를 음영으로 넣어주는 함수
-#   - 입력 파라미터 start, end가 반드시 있어야 합니다.
-#   - 자료 시작일 start, 자료 종료일 end 날짜를 그래프와 같게 하여야 합니다.
-#   - 다음과 같은 코드를 원하는 plot line 아래에 넣어야 합니다.
+# ## def nber_recession(start, end)
+# 그래프에 미국의 경기침체기(NBER 기준)를 음영으로 넣어주는 함수
+# 입력 파라미터 start, end가 반드시 있어야 합니다.
+# 자료 시작일 start, 자료 종료일 end 날짜를 그래프와 같게 하여야 합니다.
+#
+# 다음과 같은 코드를 원하는 plot line 아래에 넣어야 합니다.
 # ```python
+# recession_periods = nber_recession(start=start, end=end)
 # for peak, trough in recession_periods:
 #    ax.axvspan(peak, trough, color='gray', alpha=0.3)
 # ```
-# - def plot_save(i=None):
-#   - 그래프를 파일로 저장하는 함수
-#   - 그래프를 그리는 코드의 이름을 파일 이름으로 사용합니다.
-#   - 현재보다 하위에 있는 'pic_jpg' 디렉토리에 '파일이름.jpg, 그리고
-#   - 'pic_tif' 디렉토리에 '파일이름.tif'파일로 저장합니다.
-#   - 입력 파라미터 i는 그림의 번호입니다.
-#   - 그림을 한 개만 그리는 코드에는 i 값을 지정하지 않아도 됩니다.
-#   - for 루프로 그림을 여러개 그리는 코드에는 코드의 루핑 횟수 값 지징변수를 가져와서 넣어야
-#   - 그림별로 다른 파일로 저장됩니다.
-#   - 그림이 한개 일 때
-#       - plot_save()
-#   - 그림이 여러개 일 경우
-#       - plot_save(i=i)
+# ## def plot_save(i=None):
+#
+# 그래프를 파일로 저장하는 함수
+# 그래프를 그리는 코드의 이름을 파일 이름으로 사용합니다.
+# 현재보다 하위에 있는 'pic_jpg' 디렉토리에 '파일이름.jpg, 그리고
+# 'pic_tif' 디렉토리에 '파일이름.tif'파일로 저장합니다.
+# 입력 파라미터 i는 그림의 번호입니다.
+# 그림을 한 개만 그리는 코드에는 i 값을 지정하지 않아도 됩니다.
+# for 루프로 그림을 여러개 그리는 코드에는 코드의 루핑 횟수 값 지징변수를 가져와서 넣어야
+# 그림별로 다른 파일로 저장됩니다.
+# ```python
+# # 그림이 한개 일 때
+# plot_save()
+#
+# # 그림이 여러개 일 경우
+# plot_save(i=i)
+
+# ```
+# %matplotlib inline
 # %%
-#%matplotlib inline
-#%config InlineBackend.close_figures = False
-#%time plot_save()
-import pandas as pd
-import matplotlib.pyplot as plt
+
 import platform
+import os
+
+import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
+
 from matplotlib.ticker import StrMethodFormatter
 from matplotlib.ticker import FuncFormatter
-import matplotlib.dates as mdates
-from datetime import date
 
-# fonts 설정
+from datetime import date, timedelta
+import matplotlib.dates as mdates
+
+import pandas as pd
 
 def set_fonts():
-    # Set font depending on the platform
-    if platform.system() == 'Darwin':  # macOS
-        plt.rcParams['font.family'] = 'AppleGothic'
+
+    # 후보 폰트 리스트 (운영체제별로 다르게 설치되어 있을 수 있음)
+    font_candidates = [
+        "AppleGothic",     # macOS
+        "Malgun Gothic",   # Windows
+        "NanumGothic",     # Linux (Colab 등)
+        "DejaVu Sans"      # fallback (영문/일부 한글 지원)
+    ]
+
+    # 설치된 폰트 중 사용 가능한 것 찾기
+    available_fonts = set(f.name for f in fm.fontManager.ttflist)
+    selected_font = None
+    for font in font_candidates:
+        if font in available_fonts:
+            selected_font = font
+            break
+
+    if selected_font:
+        plt.rcParams["font.family"] = selected_font
     else:
-        plt.rcParams['font.family'] = 'Malgun Gothic'
+        print("한글 폰트를 찾을 수 없습니다. 시스템에 폰트를 설치하세요.")
 
-    # 마이너스 기호 깨짐 방지
-    plt.rcParams['axes.unicode_minus'] = False
-
+    plt.rcParams["axes.unicode_minus"] = False
 
 from fred_api import fetch_fred_series
 
@@ -96,7 +120,6 @@ def nber_recession(start, end):
 def plot_save(i=None):
 
     # 저장 및 출력
-
     # python py 파일 이름과 동일한 이름으로 그림 파일을 tif, jpg로 저장하는 루틴
     import os
     from PIL import Image
