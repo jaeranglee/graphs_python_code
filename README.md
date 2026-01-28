@@ -70,8 +70,8 @@ df = fetch_fred_series(series_id=series, start_date=start, end_date=end)
 | Parameter    | Type  | Description                                        |
 |--------------|-------|----------------------------------------------------|
 | `seires_id`  | `str` | FRED series id, example ['EFFR']                   |
-| `start_date` | `str` | ECOS timeseries start date, 'YYYY-MM-DD'           |
-| `end_date`   | `str` | ECOS timeseries end date, 'YYYY-MM-DD'             |
+| `start_date` | `str` | FRED timeseries start date, 'YYYY-MM-DD'           |
+| `end_date`   | `str` | FRED timeseries end date, 'YYYY-MM-DD'             |
 #### Return
 pd.DataFrame with datatime 'observation_date', 'series_id'
 
