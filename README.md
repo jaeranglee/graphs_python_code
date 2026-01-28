@@ -174,14 +174,13 @@ df = df.rename(columns= {"operationDate", "operationLimit", "totalAmtSubmitted",
 ### nyfed_api_rate_volume.py
 fetch_secured_series()가 정의된 파일 입니다.
 New York Fed Markets Data API에서 secured volume 또는 rate(1일물 증권담보대출금리 거래의 거래량)을 fetch합니다. 
-parameter에서 "type":을 'volume'과 'rate' 가운데 하나를 선택합니다. 
-"rate_type"으로 all, tgcr, bgcr, sofr, sofrai 가운데 하나를 입력합니다. all은 모든 자료를 호출합니다.
-"type"으로 volume, 또는 rate 하나를 선택합니다.
+"rate_type"으로 all, tgcr, bgcr, sofr, sofrai 가운데 하나를 입력합니다. all은 모든 rate type 자료를 호출합니다.
+volume을 호출 할지 또는 rate을 호출할지 호출함수를 선택합니다.
 
 ```python
 start = '2025-01-01'
 end = '2025-02-01'
-from nyfed_api_rate_volume import fetch_secred_series, fetch_all_secured_rates_vol
+from nyfed_api_rate_volume import fetch_secured_series, fetch_all_secured_rates_vol
 df = fetch_all_secured_rates_vol(start_date=start, end_date=end, , rate_type_filter=None)
 ```
 #### Return
