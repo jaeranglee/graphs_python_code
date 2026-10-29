@@ -4,7 +4,7 @@ import os
 import jupytext
 
 # ✅ Set your target directory
-target_dir = "./"  # or absolute path like "/Users/jay_m4/Downloads/wallstreet"
+target_dir = "./"  # or absolute path like "/Users/jay_m4/Projects/codes/wallstreet"
 
 for filename in os.listdir(target_dir):
     if filename.endswith(".py"):
