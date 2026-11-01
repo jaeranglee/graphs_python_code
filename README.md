@@ -149,13 +149,124 @@ sys.path.insert(0, str(_defs))
 - 그림 15는 두 판이 있습니다: `f15_beveridge.py`(베버리지커브), `f15_nfp_revision_1st_final.py`(NFP 수정 전후). 그림 17도 `f17_beveridge.py`와 색을 바꾼 `f177_beveridge.py`가 있습니다.
 - 그림 15, 16의 `data/nfp_revisions.csv`는 `nfp_revision.py`로 다시 만들 수 있습니다.
 
+## 그림 스타일 고르기 (`plot_def.py`)
+
+`defs/plot_def.py`에는 그림 모양을 한 줄로 바꾸는 스타일 함수가 있습니다.
+그림을 그리는 코드는 그대로 두고, `set_fonts()` 바로 다음에 스타일 함수 한 줄만 넣으면
+마지막의 `plot_save()`가 저장하기 직전에 그림 크기, 글자 크기, 선 굵기, 색, 축, 범례, 출처 위치를 그 스타일로 다듬습니다.
+
+| 스타일 | 부르는 법 | 모양 | 어울리는 곳 |
+|---|---|---|---|
+| 기본(classic) | 부르지 않음 | matplotlib 기본 모양에 한글 폰트와 y축 쉼표만 더함. 책에 실린 그림이 이 모양 | 화면에서 빨리 볼 때 |
+| BIS | `set_bis_style(medium="book")` | 국제결제은행(BIS) 보고서풍. 옅은 회색 바탕에 흰 가로 grid, 아래 축선만, 눈금 표시 없음. 색은 파랑·검정 두 톤 | 두 가지 색으로 인쇄하는 책, 차분한 보고서 |
+| BOK | `set_bok_style(medium="book")` | 한국은행 통화정책보고서풍. 흰 바탕, 왼쪽·오른쪽·아래 축선과 안쪽 눈금, 오른쪽에도 같은 눈금, 범례는 그림 위 가로 한 줄, 날짜는 `24.1  7  25.1`, 출처는 `자료:` | 국내 보고서처럼 보이는 그림 |
+| econ_chart | `set_econ_chart_style(medium="ppt")` | 경제학 교과서의 이론 도식(AD-AS, IS-LM 등). 자료 없이 식으로 그리는 그림용이며 전용 함수(`econ_figure`, `econ_line` 등)로 그림 | 강의 슬라이드, 교재의 이론 그림 |
+
+### book과 ppt
+
+BIS, BOK, econ_chart는 같은 모양을 두 가지 매체(`medium`)에 맞춰 줍니다. 모양은 같고 크기, 글자, 선 굵기만 다릅니다.
+
+| medium | 그림 크기 (인치) | 글자 | 쓰임 |
+|---|---|---|---|
+| `"book"` | 그림 1개 3.6×2.6, 나란히 2개 5.6×2.4~2.8 (econ_chart 3.6×3.0) | 7~8pt | 책·논문 인쇄. 본문 폭에 맞춘 크기 |
+| `"ppt"` | 8.0×5.33 (4:3 슬라이드의 내용 칸에 100%로 들어가는 크기, econ_chart 6.4×5.34) | 12~14pt (econ_chart 22~24pt) | 강의 슬라이드. 멀리서도 읽히는 글자 |
+
+- 코드의 `figsize`는 무시되고 위 크기로 바뀝니다. 그래서 그림 코드는 `figsize=(8, 4.5)`처럼 아무 크기로 두어도 됩니다.
+- 저장 파일 이름: 같은 코드로 두 판을 만들어도 서로 덮어쓰지 않게 이름 끝이 붙습니다.
+
+| 스타일 | book 파일 이름 | ppt 파일 이름 |
+|---|---|---|
+| BIS | `<코드 이름>.jpg` | `<코드 이름>_ppt.jpg` |
+| econ_chart | `<코드 이름>_book.jpg` | `<코드 이름>.jpg` |
+| BOK | `<코드 이름>.jpg` | `<코드 이름>.jpg` (같은 이름이라 덮어씀. 두 판이 다 필요하면 `plot_save(name="…")`로 이름을 따로 줌) |
+
+### 예제: 같은 그림을 여러 스타일로
+
+미국 실업률과 연방기금금리를 그리는 코드입니다. 표시한 한 줄만 바꾸면 스타일이 바뀝니다.
+
+```python
+# 공통 함수 폴더(defs)를 import 경로에 추가 (각 그림 코드 첫 부분의 경로 블록)
+import sys
+from pathlib import Path
+
+_here = Path(__file__).resolve().parent if "__file__" in globals() else Path.cwd()
+_defs = next(d for p in (_here, *_here.parents) for d in (p / "defs", p / "codes" / "defs") if d.is_dir())
+sys.path.insert(0, str(_defs))
+
+from plot_def import *          # set_fonts, set_bis_style, set_bok_style, plot_save, fetch_fred_series, plt …
+
+set_fonts()
+set_bis_style(medium="book")    # ← 이 한 줄만 바꾼다 (아래 표)
+
+start, end = "2015-01-01", "2025-12-31"
+df0 = fetch_fred_series("UNRATE", start_date=start, end_date=end)     # 실업률
+df1 = fetch_fred_series("FEDFUNDS", start_date=start, end_date=end)   # 연방기금금리
+
+fig, ax = plt.subplots(figsize=(8, 4.5), constrained_layout=True)
+ax.plot(df0["observation_date"], df0["UNRATE"], color="blue", lw=2, label="실업률")
+ax.plot(df1["observation_date"], df1["FEDFUNDS"], color="black", lw=2, label="연방기금금리")
+ax.text(0, 1.00, "(%)", transform=ax.transAxes, va="bottom", fontsize=12)   # 단위: 축 왼쪽 위
+ax.text(0, -0.12, "출처: FRED", transform=ax.transAxes, fontsize=11)       # 출처: 축 왼쪽 아래
+ax.legend(loc="upper right")
+
+plot_save()
+```
+
+| 바꿀 한 줄 | 결과 |
+|---|---|
+| (지우기) | 기본(classic). 8×4.5인치, 범례 테두리 있음 |
+| `set_bis_style(medium="book")` | BIS 책 판. 3.6×2.6인치, 회색 바탕, 파랑·먹색 |
+| `set_bis_style(medium="ppt")` | BIS 슬라이드 판. 8.0×5.33인치, 파일 이름 끝에 `_ppt` |
+| `set_bok_style(medium="book")` | BOK 책 판. 오른쪽 눈금, 범례가 위로, `출처:`가 `자료:`로, 연도는 `16 18 20` |
+| `set_bok_style(medium="ppt")` | BOK 슬라이드 판. 보고서 원래 색(파랑·황갈색) |
+| `set_bok_style("blue", "orange", medium="book")` | BOK 책 판을 파랑·황갈색 두 톤으로 |
+
+### 스타일이 잘 먹게 그림 코드를 쓰는 법
+
+- **색은 이름 네 가지로**: `color="blue"`, `"black"`, `"darkblue"`, `"gray"`. 스타일이 이 이름을 자기 색으로 바꿉니다.
+  - BIS: black→먹색, blue→파랑, darkblue→남색, gray→회색 (빨강 등 다른 색은 쓰지 않음)
+  - BOK: 앞에서 정한 톤(`tone1`, `tone2`, `tone3=` …)에 차례로 맞춤. 톤을 안 주면 book은 black·blue, ppt는 blue·orange·gray·sky
+- **단위**는 `ax.text(0, 1.00, "(%)", transform=ax.transAxes)`처럼 축 왼쪽 위에 둡니다. BOK는 오른쪽 위에도 같은 단위를 붙입니다.
+- **출처**는 `ax.text(0, -0.12, "출처: …", transform=ax.transAxes)`처럼 축 아래에 둡니다. 스타일이 위치와 글자 크기를 맞춥니다.
+- **범례**는 `ax.legend()`만 부르면 됩니다. 스타일이 새 글자 크기로 다시 만들고, BOK는 그림 위로 옮깁니다. 왼쪽·오른쪽 축(`twinx`)의 선도 함께 들어갑니다.
+- 그림 크기, 글자 크기, 선 굵기는 스타일이 정하므로 코드에서 맞추지 않아도 됩니다.
+- 이 저장소의 그림 코드(`f*.py`)도 `set_fonts()` 다음에 스타일 한 줄을 넣으면 그대로 바뀝니다. 그림마다 범례 위치 등은 손볼 수 있습니다.
+
+### 예제: 이론 도식 (econ_chart)
+
+자료 없이 식으로 그리는 AD-LRAS 그림입니다. `econ_` 함수들이 축, 곡선, 점, 보조선을 교과서 모양으로 그립니다.
+
+```python
+import numpy as np
+from plot_def import *          # (경로 블록은 위 예제와 같음)
+
+set_fonts()
+set_econ_chart_style(medium="ppt")   # 책이면 "book" (파일 이름 끝에 _book)
+
+fig, ax = econ_figure()
+Y = np.linspace(10, 90, 50)
+econ_line(ax, Y, 100 - Y)                    # AD 곡선 (남색)
+econ_line(ax, [50, 50], [5, 95])             # LRAS (수직선)
+econ_text(ax, 88, 14, "$AD$")                # 곡선 이름 (이탤릭)
+econ_text(ax, 51, 92, "$LRAS$")
+econ_point(ax, 50, 50, "A")                  # 점과 이름
+econ_guide(ax, [0, 50], [50, 50])            # 점 A에서 P축까지 파선
+econ_axes(ax, xlim=(0, 100), ylim=(0, 100),
+          xticks={50: r"$\bar{Y}$"}, yticks={50: r"$P_1$"})   # 축과 눈금 라벨
+plot_save()
+```
+
+- 곡선이 움직이기 전 모습은 `econ_line(..., tone="old")`(회색), 이동 방향은 `econ_arrow(ax, 시작점, 끝점)`, 설명 상자는 `econ_note(ax, x, y, "설명")`로 그립니다.
+- `econ_animate(fig, update, frames)`를 쓰면 ppt 판은 장면이 바뀌는 gif(`pic_gif/`)로, book 판은 마지막 장면을 그림으로 저장합니다.
+- 함수 목록과 인자는 `defs/plot_def.py` 첫 부분의 설명에 있습니다.
+
 ## 함수 파일 (`defs/`)
 
 코드 안에서 `from fred_api import fetch_fred_series`처럼 불러 씁니다. 각 파일의 첫머리에 사용법, 파라미터, 돌려주는 열이 적혀 있습니다.
 
 | 파일 (defs/)                   | 주요 함수                                                                                | 내용                                                                                                                                                |
 |--------------------------------|------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
-| `plot_def.py`                  | `set_fonts()`, `plot_save(i=None)`, `nber_recession(start, end)`                         | 한글 폰트, 그림 저장(pic_jpg·pic_tif), 미국 경기침체 음영. `from plot_def import *`로 쓰면 `plt`, `pd`, `mdates`, `fetch_fred_series`도 함께 들어옴 |
+| `plot_def.py`                  | `set_fonts()`, `set_bis_style(medium)`, `set_bok_style(…, medium)`, `set_econ_chart_style(medium)`, `plot_save(i=None)`, `nber_recession(start, end)` | 한글 폰트, 그림 저장(pic_jpg·pic_tif), 미국 경기침체 음영. `from plot_def import *`로 쓰면 `plt`, `pd`, `mdates`, `fetch_fred_series`도 함께 들어옴 그림 스타일은 위의 '그림 스타일 고르기' 참고 |
 | `fred_api.py`                  | `fetch_fred_series(series_id, start_date, end_date)`                                     | FRED 시계열. 그 밖에 `fetch_vintage_series`, `fetch_fred_vintage_dates`, `fetch_fred_as_of`(발표 시점별 값)                                         |
 | `nyfed_api_all_rates.py`       | `fetch_all_secured_rates(start_date, end_date, rate_type_filter=None)`                   | 뉴욕 연준 1일물 금리(SOFR·TGCR·BGCR·EFFR·OBFR)와 분위수                                                                                             |
 | `nyfed_api_rate_volume.py`     | `fetch_all_secured_rates_vol(start_date, end_date, rate_type_filter=None)`               | 1일물 거래 규모                                                                                                                                     |
@@ -229,6 +340,7 @@ API로 받을 수 없어 직접 내려받은 자료입니다. 코드는 `data/�
 - 저장소 맨 위에 그림 코드를 두고, 자료를 받는 함수(`defs/`)와 자료(`data/`), `requirements.txt`를 함께 공개합니다.
 - `requirements.txt`에 코드를 확인한 패키지 버전을 고정해 적었습니다(Python 3.13). 시간이 지나 패키지가 바뀌어도 같은 결과를 얻을 수 있습니다.
 - MIT 라이선스(`LICENSE`), 올리지 않는 파일 목록(`.gitignore`), API 키 견본(`defs/.env.example`)을 추가했습니다.
+- `defs/plot_def.py`의 그림 스타일(기본, BIS, BOK, econ_chart와 각각의 book·ppt 판)을 공개하고, README에 '그림 스타일 고르기' 사용법과 예제를 넣었습니다.
 - jupyter notebook(`.ipynb`) 판을 없애고 `.py`만 씁니다. 노트북을 만들던 `py_to_jupyter.py`도 지웠습니다. `# %%` 셀 구분은 그대로 있어 PyCharm 등에서 셀 단위로 실행할 수 있습니다.
 - 한국은행 ECOS 함수의 인자가 늘었습니다: `fetch_ecos_series(이름, 통계표, 항목1, 항목2, 항목3, 주기, start_date, end_date)`. 항목2, 3이 없으면 `""`을 넣습니다.
 

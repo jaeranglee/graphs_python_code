@@ -5,8 +5,74 @@
 #
 # ## 기능
 # - 한글 폰트 설정, 그래프 저장, 미국·한국 경기침체기 음영, y축 천 단위 콤마 함수 모음.
+# - 그림 스타일: 기본(classic)·BIS·BOK·econ_chart. 스타일 함수 한 줄로 모양을 바꾸고, 각 스타일은 book(인쇄)·ppt(슬라이드) 판이 있다.
 # - `from plot_def import *`로 `plt`, `pd`, `mdates`, `date`, `timedelta`, `StrMethodFormatter`, `FuncFormatter`,
 #   `fetch_fred_series`도 같이 들어온다 (스크립트들이 이를 이용하므로 "안 쓰는" import라도 지우지 말 것).
+#
+# ## 그림 스타일
+# `set_fonts()` 바로 다음에 스타일 함수를 한 번 부른다. 그림 코드는 그대로 두면, `plot_save()`가 저장 직전에
+# 그림 크기·글자 크기·선 굵기·색·축·범례·출처 위치를 그 스타일로 다듬는다 (econ_chart만 전용 econ_ 함수로 직접 그림).
+# 스타일 함수는 하나만 부른다. 나중에 부른 것이 앞의 것을 끈다.
+#
+# | 스타일 | 부르는 법 | 모양 | 어울리는 곳 |
+# |---|---|---|---|
+# | 기본(classic) | 부르지 않음 | matplotlib 기본 + 한글 폰트 + y축 쉼표 | 화면 확인, 책 『이야기로 풀어가는 현실 국제금융론』 그림 |
+# | BIS | `set_bis_style(medium="book")` | 옅은 회색 바탕, 흰 가로 grid, 아래 축선만, 눈금 표시 없음, 범례 테두리 없음, 파랑·먹색 두 톤 | 두 톤으로 인쇄하는 책 |
+# | BOK | `set_bok_style(tone1=None, tone2=None, medium="book", **tones)` | 한국은행 통화정책보고서풍: 흰 바탕, 좌·우·아래 축선과 안쪽 눈금, 오른쪽 눈금 반복, 범례는 위 가로 한 줄, 0선 검정, 1월마다 점선, 날짜 `24.1  7  25.1`, 출처 `자료:` | 보고서처럼 보이는 그림 |
+# | econ_chart | `set_econ_chart_style(medium="ppt")` | 교과서 이론 도식: 왼쪽·아래 축선, 축 끝 *P*·*Y*, 남색 곡선, Times 이탤릭 라벨, 분홍 설명 상자 | 자료 없는 이론 그림(AD-AS, IS-LM 등) |
+#
+# **book과 ppt** (모양은 같고 크기·글자·선 굵기만 다름. 값은 `BIS_MEDIA`, `BOK_MEDIA`, `ECON_MEDIA`)
+#
+# | medium | 그림 크기(인치) | 글자 | 저장 이름 |
+# |---|---|---|---|
+# | `"book"` | 패널 1개 3.6×2.6, 2개 이상 5.6×2.4(BIS)·5.6×2.8(BOK), econ 3.6×3.0 | 7~8pt | BIS·BOK `<이름>`, econ `<이름>_book` |
+# | `"ppt"` | 8.0×5.33 (4:3 슬라이드 내용 칸에 100%), econ 6.4×5.34 | 12~14pt (econ 22~24pt) | BIS `<이름>_ppt`, BOK·econ `<이름>` |
+#
+# - BIS·BOK는 스크립트의 `figsize`를 무시하고 위 크기로 바꾼다 (패널 수로 1개/2개 이상 판단).
+# - BOK는 book·ppt 저장 이름이 같아 덮어쓴다. 두 판이 다 필요하면 `plot_save(name="…")`로 이름을 준다.
+#
+# **스타일이 잘 먹게 쓰는 법**
+# - 색은 `color="blue"`, `"black"`, `"darkblue"`, `"gray"` 네 이름으로 쓴다. 스타일이 자기 색으로 바꾼다.
+#   BIS: black→먹색 `#222222`, blue→파랑 `#1f5fbf`, darkblue→남색 `#1b3a5c`, gray→회색 (다른 색상은 쓰지 않음).
+#   BOK: `tone1`, `tone2`, `tone3=` … 로 톤의 개수와 색을 정함(이름은 `BOK_COLORS` 키·black·matplotlib 색·hex).
+#   스크립트 색 이름이 톤에 있으면 그 톤, 없으면 남은 톤을 차례로. 톤을 안 주면 book = black·blue, ppt = blue·orange·gray·sky.
+# - 단위는 `ax.text(0, 1.00, "(%)", transform=ax.transAxes)` (BOK는 오른쪽 위에도 복사),
+#   출처는 `ax.text(0, -0.12, "출처: …", transform=ax.transAxes)` (BIS는 작은 회색, BOK는 `자료:`로 바꿈).
+# - 범례는 `ax.legend()`만 부르면 스타일이 새 글자 크기로 다시 만든다(twinx 선 포함). BOK는 그림 위로 옮긴다.
+#
+# ```python
+# from plot_def import *
+#
+# set_fonts()
+# set_bis_style(medium="book")          # BIS 책 판
+# # set_bis_style(medium="ppt")         # BIS 슬라이드 판 → <이름>_ppt.jpg
+# # set_bok_style(medium="book")        # BOK 책 판 (black·blue)
+# # set_bok_style("blue", "orange", medium="ppt")   # BOK 슬라이드 판, 파랑·황갈색
+#
+# fig, ax = plt.subplots(figsize=(8, 4.5), constrained_layout=True)   # 크기는 스타일이 바꿈
+# ax.plot(df["observation_date"], df["UNRATE"], color="blue", label="실업률")
+# ax.plot(df["observation_date"], df["FEDFUNDS"], color="black", label="연방기금금리")
+# ax.text(0, 1.00, "(%)", transform=ax.transAxes, va="bottom")
+# ax.text(0, -0.12, "출처: FRED", transform=ax.transAxes)
+# ax.legend()
+# plot_save()
+# ```
+#
+# econ_chart (이론 도식):
+# ```python
+# import numpy as np
+# set_fonts()
+# set_econ_chart_style(medium="ppt")    # 책이면 "book" → <이름>_book.jpg
+# fig, ax = econ_figure()
+# Y = np.linspace(10, 90, 50)
+# econ_line(ax, Y, 100 - Y)             # AD (남색). 이동 전 곡선은 tone="old"(회색)
+# econ_line(ax, [50, 50], [5, 95])      # LRAS
+# econ_text(ax, 88, 14, "$AD$"); econ_text(ax, 51, 92, "$LRAS$")
+# econ_point(ax, 50, 50, "A")
+# econ_guide(ax, [0, 50], [50, 50])     # 점 A에서 P축까지 파선
+# econ_axes(ax, xlim=(0, 100), ylim=(0, 100), xticks={50: r"$\bar{Y}$"}, yticks={50: r"$P_1$"})
+# plot_save()
+# ```
 #
 # ## 출처
 # - `nber_recession`: FRED `USREC`(NBER 경기침체 지표)를 `fetch_fred_series`로 받음
