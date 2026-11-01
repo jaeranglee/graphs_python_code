@@ -1,31 +1,51 @@
 # %% [markdown]
-# # [그림2] BTFP 잔액과 정책금리
-# 이제 세이트루이스 연준이 제공하는 FRED애서 API를 이용해서 자료를 불러오고 그래프를 그리는 방법을 알아보자.
-# 먼저 FRED API 홈페이지에 접속한다. 검색 엔진에서 'fred api'를 키워드로 검색해서 찾아가는 것이 빠르다.
-# FRED API 홈페이지 오른 쪽에 'API Keys | Terms of Use' 항목이 있는데 'API Keys' 링크를 클릭한다.
-# 'Request or view your API keys' 항목을 링크하고 보면 회원가입을 해야 함을 알 수 있다.
-# 'Register' 항목을 클릭하고 회원가입 절차를 밟는다. 반드시 본인의 이메일 계정이 있어야 한다.
-# 이메일 확인 과정을 거치면 계정이 생성된다. 계정을 만들고 'Sign in' 항목을 통해 로그인 한다.
-# 다시 'Request or view your API keys' 링크를 타고 들어가서 API를 요청하는 양식을 채우고 제출하면 바로 API key가 발급된다.
-# 상업적 목적으로 대량의 데이터를 요청하지 않는다면, 발급목적에 'Personal Study' 정도로 적으면 된다.
-# 나의 계정에서 key를 확인하고 복사해 놓는다. 영어와 숫자가 포함된 긴 문자열이며 FRED API에 접속할 수 있는 비밀번호이다.
+# # [그림 2] BTFP 잔액과 정책금리
 #
-# FRED API Key를 발급 받았다면, 지금부터 FRED API로 자료를 불러와서 본문의 '[그림2] BTFP 잔액과 정책금리' 그래프를 그리는 코드를 이용해 보자.
-# 먼저 PyCharm 프로그램을 실행시켜서 f2_btfp.py 파일을 열어본다.
-# 코드가 열렸으면 api_key = "FRED_API_KEY" 부분을 바꿔야 한다. "FRED_API_KEY"를 지우고 따옴표 안에 발급 받은 FRED API key를 넣어야 한다.
-# api_key = 'aaabbbbcccdddeeefff11122233344' 이런 식으로 넣는다.
-# 윈도우 환경이라면 shift + control + f10 조합으로 동시에 키를 누르면 코드가 실행된다. 맥 환경에서는 상단 우측 선택메뉴에서
-# ‘현재 파일’을 선택하고 그 바로 오른쪽에 있는 세모 표시를 클릭하면 실행된다. 정상적으로 실행이 완료되면 모니터에 그래프가 나타난다.
+# ## 이 코드가 하는 일
+# FRED에서 자료 두 개를 받아 그림 두 개를 나란히 그린다.
+# - 왼쪽: BTFP 대출 잔액(매주 수요일 기준)
+# - 오른쪽: 실효연방기금금리(미국 은행들이 서로 하루 동안 돈을 빌려줄 때 실제로 적용된 평균 금리)
 #
-# 그래프를 그리는 코드는 크게 4단계로 구성되어 있다. 1단계는 준비단계이며 라이브러리를 불러오는 부분, 한글과 영문폰트를 정의하는 부분으로 되어 있다.
-# 2단계는 자료호출 단계이며 FRED에서 자료를 호출해서 변수에 저장하는 역할을 한다. 자료의 시작과 끝을 정하고 필요한 가공을 하기도 한다.
-# 3단계는 그래프를 그리는 부분이고, 마지막 4단계는 그래프를 파일로 저장하고 화면에 보여주는 코드이다. 이하 내용은 python을 사용하고, PyCharm을 코드 에디터로 설치하여 사용하는 것을
-# 기준으로 설명하였다. 다른 코드들도 대체로 같은 구조로 되어 있다.
+# ## 그림이 다루는 내용
+# BTFP(Bank Term Funding Program)는 2023년 3월 SVB 파산 직후 연준이 만든 긴급 대출 제도이다.
+# 은행이 가진 국채 등을 담보로 맡기면 최장 1년 동안 돈을 빌려주었다. 금리가 올라 국채 가격이 떨어졌는데도
+# 담보 가치를 액면가 그대로 쳐 주었기 때문에, 은행이 손해를 보고 국채를 팔지 않아도 예금 인출에 대응할 수 있었다.
+# 신규 대출은 2024년 3월 11일에 끝났다. 오른쪽 그림은 같은 시기 정책금리가 0%대에서 5%대로 오른 모습을 보여준다.
 #
-# 맨 처음은 그림을 그리기 위해 필요한 패키지들을 불러오는 부분이다. pandas는 자료를 다루는 패키지이다. 모든 그래프에서
-# 사용한 자료는 dataframe이라는 형태를 이용한다. pandas가 dataframe를 다루는 도구이다. 첫 줄은 pandas를 불러와서 pd라는 이름으로 줄여서 정의한 것이다.
-# 그 다음 줄은 그래프를 그리는 matplotlib.pypot을 불러 오고 이것을 plt로 줄여서 쓴다는 것이다. 세번 째 줄은 matplotlib.date를 불러 오는데 날짜 출력 양식을 제어하는 역할을 한다.
-# 이것도 줄여서 mdates라고 정의했다. 필요할 때 마다 패키지를 설치하면 된다. 패키지 이름을 줄여서 쓰는 표현이 관행으로 굳어져 있으니 그대로 따라하면 된다.
+# ## 결과물
+# pic_jpg/f2_btfp.jpg, pic_tif/f2_btfp.tif가 저장되고 화면에도 그림이 나타난다.
+#
+# ## 1. FRED API key 받기
+# API는 프로그램이 다른 사이트에 자료를 요청하는 통로이고, API key는 그 통로를 쓰는 개인 비밀번호이다.
+# 1. 검색 엔진에서 'fred api'를 검색해 FRED API 홈페이지로 간다.
+# 2. 오른쪽 'API Keys' 링크를 누르면 회원가입이 필요하다고 나온다. 'Register'에서 이메일로 가입한다.
+# 3. 'Sign in'으로 로그인한 뒤 다시 'Request or view your API keys'로 가서 신청 양식을 내면 바로 key가 나온다.
+#    사용 목적은 'Personal Study' 정도로 적으면 된다.
+# 4. key는 영어와 숫자로 된 긴 문자열이다. 복사해 두고 남에게 보이지 않게 한다.
+#
+# ## 2. 코드 실행하기
+# 1. PyCharm에서 f2_btfp.py를 연다.
+# 2. api_key = "your api key"에서 your api key를 지우고 따옴표 안에 내 key를 넣는다.
+#    예: api_key = 'aaabbbbcccdddeeefff11122233344'
+# 3. 윈도우는 shift + control + f10을 함께 누르고, 맥은 오른쪽 위에서 '현재 파일'을 고른 뒤 세모 버튼을 누른다.
+# 4. 정상적으로 끝나면 화면에 그림이 나타난다.
+#
+# ## 3. 코드의 네 단계
+# 다른 그림의 코드도 대체로 같은 순서로 되어 있다.
+# 1. 준비: 패키지를 불러오고 한글 폰트를 정한다.
+# 2. 자료 받기: FRED에서 자료를 받아 변수에 담는다. 기간을 정하고 필요하면 단위를 바꾼다.
+# 3. 그리기: 그래프를 그리고 단위, 범례, 출처를 붙인다.
+# 4. 저장: 그림을 파일로 저장하고 화면에 보여준다.
+#
+# ## 4. 패키지 불러오기 (아래 셀)
+# - matplotlib.dates (mdates): x축 날짜 표시 형식을 정한다.
+# - matplotlib.pyplot (plt): 그래프를 그린다.
+# - pandas (pd): 표 형태의 자료(dataframe)를 다룬다. 이 책의 모든 그림은 자료를 dataframe으로 다룬다.
+# 패키지 이름을 mdates, plt, pd처럼 줄여 쓰는 것은 관례이니 그대로 따라 하면 된다.
+# 설치되지 않은 패키지는 pip install 패키지이름으로 설치한다.
+#
+# ※ 책과 달라진 점: 따옴표 안에 key를 넣지 않고 그대로 두면 defs/.env 파일에 적어 둔 FRED_API_KEY를 대신 읽는다.
+# FRED 요청이 실패하면 FRED가 보낸 오류 메시지를 보여주고 멈춘다. 오른쪽 그림의 범례는 선과 겹치지 않도록 오른쪽 아래로 옮겼다.
 # %%
 # %matplotlib inline
 import matplotlib.dates as mdates
@@ -33,8 +53,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # %% [markdown]
-# 다음은 한글과 영문의 폰트를 정의하는 코드이다. 애플 컴퓨터를 사용하면 애플고딕체를 쓰고,
-# 윈도우 기반 컴퓨터를 사용하면 맑은고딕체를 쓰도록 했다. 마지막 줄은 마이너스 부호가 깨져 보이는 것을 방지하는 코드이다.
+# ### 한글 폰트 정하기
+# matplotlib은 기본 폰트에 한글이 없어서 그대로 두면 한글이 네모로 깨진다.
+# 아래 코드는 후보 폰트를 차례로 확인해 컴퓨터에 설치된 첫 번째 폰트를 쓴다.
+# - 맥: AppleGothic, 윈도우: Malgun Gothic, 리눅스나 Colab: NanumGothic, 마지막 대안: DejaVu Sans
+# - 하나도 없으면 한글 폰트를 설치하라는 안내를 출력한다.
+# 마지막 줄은 음수 부호(-)가 깨져 보이는 것을 막는다.
 # %%
 
 import os
@@ -67,37 +91,90 @@ else:
 plt.rcParams["axes.unicode_minus"] = False
 
 # %% [markdown]
-# 이제 자료호출 단계로 넘어 간다. Open API를 사용하여 FRED에서 원하는 자료를 불러오고 불러온 자료를 변수에 저장한다.
-# 이 때 사용할 requests 패키지를 먼저 불러 와야 한다.
+# ### 2단계: 자료 받기
+# 이제 FRED에 자료를 요청한다. 인터넷으로 요청을 보내고 답을 받는 일은 requests 패키지가 맡는다.
+# Path(pathlib)는 폴더와 파일 경로를 다루는 기본 모듈이며, 캐시 폴더를 찾고 만들 때 쓴다.
 # %%
+from pathlib import Path
+
 import requests
 
 # %% [markdown]
-# 세인트루이스 연준의 FRED에 사용자 등록을 하고 api key를 받아서 api_key라는 변수에 할당한다. key 값은
-# 받드시 따옴표 안에 써야한다. 예시를 위해 "FRED_API_KEY"라고 가상의 key 값을 할당했다.
+# ### API key 넣기
+# 발급받은 key를 api_key 변수에 담는다. key는 반드시 따옴표 안에 적는다.
+# 여기서는 예시로 "your api key"라는 가짜 값을 넣어 두었다.
+#
+# key를 바꾸지 않고 그대로 두면, 아래 if 문이 defs/.env 파일에서 FRED_API_KEY를 찾아 대신 넣는다.
+# .env는 key를 코드와 따로 보관하는 파일이며 다른 그림의 코드들도 함께 쓴다(README 참고).
 # %%
 
 
 api_key = "your api key"
 
+# 키를 직접 넣지 않았다면 환경변수나 defs/.env의 FRED_API_KEY를 쓴다.
+if api_key == "your api key":
+    from dotenv import load_dotenv
+
+    _here = Path(__file__).resolve().parent if "__file__" in globals() else Path.cwd()
+    for _p in (_here, *_here.parents):
+        if (_p / "defs" / ".env").is_file():
+            load_dotenv(_p / "defs" / ".env")
+            break
+    api_key = os.getenv("FRED_API_KEY", api_key)
+
 # %% [markdown]
-# 다음은 자료 불러오는 함수를 정의한 부분이다. 함수의 이름은 fetch_fred_series()이다. 괄호 안에 함수에 필요한 변수가 있다.
-# series_id가 호출할 자료인데, FRED에서 사용하는 이름을 써야한다. FRED에서 사용하는 데이터의 이름은 FRED API 홈페이지에서 검색해서 찾아야 한다.
-# 돋보기가 그려진 검색창에 'BTFP'라는 키워드로 찾으면 결과를 보여준다. 검색 결과중에 원하는 데이터를 클릭하면 데이터에 대한 설명과 그래프가 보인다.
-# 이 때 보여주는 데이터의 이름을 복사해서 넣는다. 그렇게 찾은 'H41RESPPALDKNWW'는 연준의 BTFP 프로그램 지원 잔액이다.
-# start는 자료의 시작, end는 자료의 마지막이다. end는 2025년 말로 정했다. 미래의 날짜를 end로 정하면 FRED에 수록된 자료료 중에 이용 가능한 자료까지만 불러온다.
-# def는 함수라는 뜻이고 fetch_fred_series()는 함수의 이름이다. 괄호안은 함수에 이용되는 파라미터 값이 들어 간다.
-# series_id, start_date, end_date를 정해주어야 한다. start_date는 '2022-01-01'이며 start라는 변수에 할당했다.
-# FRED는 일간자료, 월별자료, 분기별자료, 연간자료 모두 같은 형식으로 날짜를 표시한다. 모두 해당 기간의 첫 날로 쓴다. 예를 들면
-# 2022년 1분기는 '2021-01-01', 2분기는 '2022-04-01'이 된다. 연간자료라면 2023년 자료는 '2023-01-01'로 표시된다.
-# def 함수의 마지막 줄에서 불러온 자료를 df라는 dataframe으로 내주는데, df의 첫번 째 열이 'date', 두번 째 열이 series_id이다.
+# ### 자료를 받는 함수 만들기
+# def는 함수를 만든다는 뜻이다. 함수는 자주 하는 일을 묶어 이름을 붙인 것이며, 여기서는 fetch_fred_series라고 이름 붙였다.
+# 괄호 안의 값(파라미터) 세 개를 주면 그 자료를 받아 dataframe으로 돌려준다.
+# - series_id: FRED가 자료마다 붙인 이름. FRED 홈페이지 검색창에서 'BTFP'를 검색하고 원하는 자료를 누르면 볼 수 있다.
+#   BTFP 대출 잔액의 이름은 'H41RESPPALDKNWW'이다.
+# - start_date: 시작일. start 변수에 '2022-01-01'을 담아 두었다.
+# - end_date: 종료일. end 변수에 '2025-10-01'을 담아 두었다. 아직 오지 않은 날짜를 넣으면 있는 자료까지만 온다.
+#
+# FRED는 일별·월별·분기별·연간 자료 모두 그 기간의 첫날로 날짜를 적는다.
+# 예를 들어 2022년 1분기는 '2022-01-01', 2분기는 '2022-04-01', 2023년 연간 자료는 '2023-01-01'이다.
+#
+# 함수 안에서 하는 일
+# 1. 캐시 파일이 있으면 FRED에 요청하지 않고 그 파일을 읽는다(아래 '캐시' 설명).
+# 2. 없으면 requests.get()으로 FRED에 요청을 보내고, 받은 답을 r.json()으로 읽는다.
+# 3. 답에 'observations'(관측값)가 없으면 요청이 실패한 것이므로 FRED의 오류 메시지(예: key가 틀림)를 보여주고 멈춘다.
+# 4. 관측값을 dataframe으로 바꾸고 날짜와 값을 각각 날짜형, 숫자형으로 바꾼 뒤 캐시 파일로 저장한다.
+# 5. 첫째 열이 'date', 둘째 열이 series_id인 dataframe을 돌려준다.
+#
+# ### 캐시(cache)
+# 캐시는 한 번 받은 자료를 컴퓨터에 저장해 두었다가 다음에 다시 쓰는 것이다.
+# 코드를 여러 번 실행해도 FRED에 같은 요청을 반복하지 않아 빠르고, 인터넷이 끊겨도 그림을 다시 그릴 수 있다.
+# - 저장 폴더: defs 폴더 옆의 cache/fred_cache. 다른 그림 코드가 쓰는 defs/fred_api.py와 같은 폴더를 쓴다.
+#   처음 실행할 때 폴더가 없으면 mkdir()이 만든다.
+# - 파일 이름: '자료이름.시작일.종료일.parquet' (예: RIFSPFFNB.2022-01-01.2025-10-01.parquet).
+#   이름 규칙이 fred_api.py와 같아서 두 코드가 서로의 캐시를 그대로 쓴다.
+# - parquet는 표 형태의 자료를 빠르게 읽고 쓰는 파일 형식이다(pyarrow 패키지 필요).
+# - 새로 받고 싶으면 use_cache=False를 넣거나 캐시 파일을 지운다.
 # %%
 
 start = "2022-01-01"
 end = "2025-10-01"
 
+# 캐시 폴더: defs 폴더가 있는 곳의 cache/fred_cache (defs를 못 찾으면 이 파일 옆의 cache/fred_cache)
+_here = Path(__file__).resolve().parent if "__file__" in globals() else Path.cwd()
+_root = next(
+    (d.parent for p in (_here, *_here.parents) for d in (p / "defs", p / "codes" / "defs") if d.is_dir()),
+    _here,
+)
+CACHE_DIR = _root / "cache" / "fred_cache"
+CACHE_DIR.mkdir(parents=True, exist_ok=True)  # 처음 실행할 때 폴더를 만든다.
 
-def fetch_fred_series(series_id, start_date=start, end_date=end):
+
+def fetch_fred_series(series_id, start_date=start, end_date=end, use_cache=True):
+
+    cache_file = CACHE_DIR / f"{series_id}.{start_date}.{end_date}.parquet"
+
+    # 캐시가 있으면 FRED에 요청하지 않고 읽는다.
+    if use_cache and cache_file.exists():
+        print(f"캐시 사용: {cache_file.name}")
+        df = pd.read_parquet(cache_file)
+        df["date"] = pd.to_datetime(df["date"])  # fred_api.py가 만든 캐시는 date가 글자로 저장돼 있다.
+        return df[["date", series_id]]
 
     url = "https://api.stlouisfed.org/fred/series/observations"
     params = {
@@ -109,30 +186,34 @@ def fetch_fred_series(series_id, start_date=start, end_date=end):
     }
     r = requests.get(url, params=params)
     data = r.json()
+    if "observations" not in data:
+        raise RuntimeError(f"FRED 요청 실패({series_id}): {data.get('error_message', data)}")
 
     df = pd.DataFrame(data["observations"])
     df["date"] = pd.to_datetime(df["date"])
     df[series_id] = pd.to_numeric(df["value"], errors="coerce")
+
+    # fred_api.py와 같은 열 구성으로 저장한다(observation_date 열도 넣는다).
+    df["observation_date"] = df["date"]
+    df.to_parquet(cache_file)
     return df[["date", series_id]]
 
 
 # %% [markdown]
-# 다음은 fetch_fred_series() 함수를 이용해서 데이터를 불러와 dataframe에 할당하는 부분이다.
-# FRED에서 'H41RESPPALDKNWW'를 불러와서 df0라는 이름의 dataframe에 할당한다. 'H41RESPPALDKNWW'가 series_id이며 api_key는 앞에서 정의한 사용자의 api_key 값이다.
-# FRED에서 검색해보면 'H41RESPPALDKNWW'는 Bank Term Funding Program의 매주 수요일 잔액이라고 되어 있다.
-# df0의 첫째 열은 'date', 둘째 열은 'H41RESPPALDKNWW'이 된다. 같은 방식으로 'RIFSPFFNB'를 불러와서 df1이라는 dataframe에 할당한다. 'RIFSPFFNB'이 바로
-# Federal Funds Effective Rate이다. df1의 첫째 열은 'date', 둘째 열은 'RIFSPFFNB'이 된다.
+# ### 함수로 자료 받기
+# 방금 만든 함수로 자료 두 개를 받는다.
+# - df0: 'H41RESPPALDKNWW', BTFP 대출 잔액(매주 수요일, 백만 달러). 열 이름은 'date'와 'H41RESPPALDKNWW'
+# - df1: 'RIFSPFFNB', 실효연방기금금리(%). 열 이름은 'date'와 'RIFSPFFNB'
 # %%
 
 df0 = fetch_fred_series("H41RESPPALDKNWW", start_date=start, end_date=end)
 df1 = fetch_fred_series("RIFSPFFNB", start_date=start, end_date=end)
 
 # %% [markdown]
-# df0에 자료가 잘 들어왔는지 확인하기 위해 df0의 처음 다섯 줄만 출력해 본다.
-# dataframe의 구조를 이해하는 데에도 도움이 된다. 자료가 잘 들어왔다면 첫 번째 열의 이름은 date, 두 번째 열의
-# 이름은 H41RESPPALDKNWW로 나온다. 두 번째 줄부터 자료가 나오는데 먼저 인덱스가 나온다. 첫 번째 줄의 인덱스는 0,
-# 날짜는 2022-01-05, 자료는 0.0이다. 인덱스는 각 줄의 페이지 번호 같은 것이다. 현재의 첫 번째 열인 date를 인덱스로
-# 만들기도 한다.
+# ### 받은 자료 확인하기
+# df0.head()는 처음 다섯 줄을 보여준다. 자료가 잘 왔는지, dataframe이 어떻게 생겼는지 확인할 수 있다.
+# 아래 결과처럼 맨 왼쪽 숫자(0, 1, 2, ...)는 각 줄의 번호(index)이고, 그 옆에 날짜(date)와 BTFP 잔액이 나온다.
+# 2022년에는 BTFP가 없었으므로 값이 0.0이다. 다음 줄은 BTFP 잔액의 최댓값(백만 달러)을 출력한다.
 # %%
 print(df0.head())
 print(df0["H41RESPPALDKNWW"].max())
@@ -146,17 +227,18 @@ print(df0["H41RESPPALDKNWW"].max())
 # 4 2022-02-02              0.0
 # ```
 # %% [markdown]
-# 이제부터 3단계, 그래프를 그리는 부분이다. fig는 그림이라는 정의이고 그림의 이름은 ax인데 괄호안의 1,2는 한 줄에 2개의 그림이 있다는 뜻이다.
-# 그림의 크기는 가로가 8, 세로가 4.5이고 constrained_layout=True는 그림이 꽉차게 보이도록 한다.
+# ### 3단계: 그래프 그리기
+# plt.subplots(1, 2, ...)는 한 줄에 그림 두 개를 만든다. fig는 그림 전체, ax[0]은 왼쪽, ax[1]은 오른쪽 그림이다.
+# figsize=(8, 4.5)는 가로 8인치, 세로 4.5인치이고, constrained_layout=True는 글자가 겹치지 않게 간격을 맞춘다.
 #
-# ax[0]는 첫 번째 그림이며, plot은 선그래프를 의미하고 가로 축에는 df0['date']를, 세로축에 df0['H41RESPPALDKNWW']/1e2를 놓고 선그래프를 그린다. /1e2는 1x10의 제곱 즉 100으로 나누었다는 의미이다.
-# 백만 달러 단위를 억 달러 단위로 바꾸기 위해서이다. 선그래프의 가로 축에 날짜가 들어가고 세로 축에 BTFP잔액이 들어간다. 선그래프에 'BTFP'라는 라벨을 달았고, 붉은 색으로 했고, 선의 굵기는 2이다.
-#
-# ax[0], 즉 첫 번째 그림에 가로로 선을 하나 그렸는데 y=0에 해당하는 부분이고, 회색이며, 라인스타일이 점선이다.
-# 다음에 x축에 날짜를 표시하는데 연도만 표시한다. 라벨을 박스에 넣어 표시하고, 박스 좌상단 꼭지점이 비례적으로 가로 0.2,
-# 세로 0.7쯤에 위치하게 했다. y축의 축 라벨이 숫자로 보이게 했다. 그림의 상단 왼쪽에 (억 달러)라는 단위 표시를 달았고 그래프 왼쪽으로 정렬했으며,
-# 글자의 바닥이 그림 바로 위에 붙도록 했고, 글자색은 검정, 폰트 크기는 12이다. 글자를 비스듬하게 쓰지 않고 가로 쓰기로 했다. 출처를 FRED로 명시했고,
-# 음영구간이 BTFP를 실시한 시기를 의미한다고 표시했다. 가로 세로로 그리드를 그리지 않아서 깔금한 모양이 나오게 했다.
+# 왼쪽 그림(ax[0])에서 하는 일
+# - plot(): x축에 날짜, y축에 BTFP 잔액을 놓고 파란 선(굵기 2)을 그린다.
+#   잔액을 1e2(=100)로 나누어 백만 달러를 억 달러 단위로 바꾼다.
+# - axhline(y=0, ...): 0 높이에 회색 점선을 긋는다.
+# - x축에는 연도만 표시하고, y축 숫자에는 세 자리마다 쉼표를 넣는다(StrMethodFormatter).
+# - 범례(선 이름 'BTFP' 상자)는 선과 겹치지 않는 오른쪽 위에 둔다.
+# - 그림 왼쪽 위에 단위 (억 달러)를, 아래에 출처와 음영 설명을 적는다.
+# - grid(False): 격자선을 그리지 않아 깔끔하게 보이게 한다.
 # %%
 fig, ax = plt.subplots(1, 2, figsize=(8, 4.5), constrained_layout=True)
 
@@ -170,7 +252,7 @@ from matplotlib.ticker import StrMethodFormatter
 ax[0].yaxis.set_major_formatter(StrMethodFormatter("{x:,.0f}"))  # Comma every 3 digits
 
 
-ax[0].legend(loc="upper left", bbox_to_anchor=(0.2, 0.7))
+ax[0].legend(loc="upper right")
 ax[0].yaxis.label.set_visible(True)
 ax[0].text(
     0,
@@ -194,8 +276,9 @@ ax[0].text(
 )
 ax[0].grid(False)
 # %% [markdown]
-# ax[1]이 두 번째 그림인데 가로축에 날짜, 세로축에 실효연방기금금리를 그리도록 했고, 선의 이름을 'Effective Federal Funds Rate'로 달았다.
-# 붉은 선이고 선의 굵기는 2이다. 나머지는 ax[0]에 설명한 것과 유사하다.
+# 오른쪽 그림(ax[1])은 x축에 날짜, y축에 실효연방기금금리를 놓고 파란 선을 그린다.
+# 선 이름은 'Effective Federal Funds Rate'이고, 범례는 선이 없는 오른쪽 아래에 둔다.
+# 나머지(0 점선, 단위, 출처)는 왼쪽 그림과 같다.
 # %%
 ax[1].plot(
     df1["date"],
@@ -205,7 +288,7 @@ ax[1].plot(
     lw=2,
 )
 ax[1].axhline(y=0, color="gray", linestyle="--")
-ax[1].legend(loc="upper left", bbox_to_anchor=(0.35, 0.7))
+ax[1].legend(loc="lower right")
 ax[1].xaxis.set_major_locator(mdates.YearLocator())
 
 ax[1].text(
@@ -230,7 +313,9 @@ ax[1].text(
 ax[1].grid(False)
 
 # %% [markdown]
-# 첫 번째, 두 번째 그림에 음영구간을 추가했다. 음영의 시작은 2023년 3월 12일이고, 끝은 2024년 3월 11일이다. 연준이 BTFP를 실시했던 시기를 의미한다.
+# ### 음영 넣기
+# 두 그림 모두에 BTFP를 운영한 기간(2023년 3월 12일 ~ 2024년 3월 11일)을 회색으로 칠한다.
+# axvspan(시작일, 종료일, ...)은 두 날짜 사이를 세로로 칠하고, alpha=0.2는 색을 옅게(투명도 20%) 한다.
 # %%
 from datetime import datetime
 
@@ -241,35 +326,54 @@ for i in [0, 1]:
         ax[i].axvspan(start_date, end_date, color="gray", alpha=0.2)
 
 # %% [markdown]
-# 그림을 파일로 저장하는 단계이다. 먼저 그림을 저장하기 위해 필요한 os, Image 패키지가 호출된다.
-# 설치되어 있지 않다면, 이번에 새로 설치해야 한다. 이 파일의 이름을 base_filename 변수에 할당한다.
-# 이 파일의 경우 f2_btfp가 base_filename에 할당된다.
+# ### 4단계: 그림 저장
+# 다른 그림 코드들은 마지막 줄의 plot_save() 한 줄로 그림을 저장한다(defs/plot_def.py).
+# 이 파일은 저장 과정을 보여주려고 plot_save()가 하는 일을 코드에 그대로 풀어 적었다. 결과 파일도 같다.
+# 1. 이 파일의 이름(f2_btfp)을 그대로 그림 파일 이름으로 쓴다.
+# 2. pic_tif, pic_jpg 폴더가 없으면 만든다.
+# 3. y축 숫자에 세 자리마다 쉼표를 넣는다. 소수점 자리수는 눈금 값에 맞춰 정한다.
+#    예: 눈금이 1000, 2000이면 '1,000', '2,000' / 2.5, 3.0이면 '2.5', '3.0'
+# 4. 해상도 300dpi로 tif와 jpg 두 가지로 저장한다. tif는 LZW 방식으로 압축한다.
+#    LZW는 화질을 그대로 두고 파일 크기만 줄이는 압축이다(무손실 압축, 크기 약 1/10).
+# 5. jpg를 RGB 색 체계로 바꿔 다시 저장한다. RGB는 모니터에서 쓰는 빨강·초록·파랑 색 체계이다.
+# 6. plt.show()로 그림을 화면에 띄운다.
+#
+# os는 파일과 폴더를 다루는 기본 모듈이고, PIL(Image)은 그림 파일을 다루는 패키지이다(pip install pillow).
 # %%
 
 import os
 
+from matplotlib.ticker import StrMethodFormatter
 from PIL import Image
 
+# 1. 그림 파일 이름 = 이 .py 파일 이름
 try:
     base_filename = os.path.splitext(os.path.basename(__file__))[0]
-except NameError:
-    base_filename = "default_filename"
+except NameError:  # jupyter처럼 __file__이 없을 때
+    base_filename = "f2_btfp"
 
-# 저장 경로를 설정하고 파일 이름을 정해준다.
 image_path_tif = f"pic_tif/{base_filename}.tif"
 image_path_jpg = f"pic_jpg/{base_filename}.jpg"
 
-# 저장 경로가 없으면 자동으로 생성하도록 했다.
+# 2. 저장 폴더가 없으면 만든다.
 os.makedirs("pic_tif", exist_ok=True)
 os.makedirs("pic_jpg", exist_ok=True)
 
-# 그래프를 파일로 저장한다.
-plt.savefig(image_path_tif, dpi=300)
+# 3. 모든 y축에 천 단위 쉼표. 눈금 값을 정확히 나타내는 가장 적은 소수점 자리수(0~6)를 고른다.
+for a in plt.gcf().axes:
+    ticks = a.get_yticks()
+    d = 0
+    while d < 6 and any(abs(t - round(t, d)) > 1e-9 * max(1.0, abs(t)) for t in ticks):
+        d += 1
+    a.yaxis.set_major_formatter(StrMethodFormatter(f"{{x:,.{d}f}}"))
+
+# 4. 300dpi로 저장. tif는 무손실 LZW 압축
+plt.savefig(image_path_tif, dpi=300, pil_kwargs={"compression": "tiff_lzw"})
 plt.savefig(image_path_jpg, dpi=300)
 
-# 그래프를 저장한 그림파일의 색공간을 JPEG와 CMYK로 각각 변환한다. JPEG는 주로 모니터 출력용, CMYK는 인쇄용으로 사용된다.
-# 마지막 줄이 그래프를 모니터로 보여준다.
-
-img = Image.open(image_path_jpg).convert("CMYK")
+# 5. jpg를 RGB로 바꿔 다시 저장
+img = Image.open(image_path_jpg).convert("RGB")
 img.save(image_path_jpg, "JPEG")
+
+# 6. 화면에 띄우기
 plt.show()

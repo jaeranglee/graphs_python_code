@@ -1,31 +1,32 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 44] 미국 재정수지 흑자기
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - fred_api.py
+#
+# ## 이 코드가 하는 일
+# FRED에서 미국 연방정부의 연간 재정수지를 받아, 흑자를 낸 두 시기를 그림 두 개로 나눠 그린다.
+#
+# ## 그림이 다루는 내용
+# 재정수지 = 정부 수입 - 정부 지출. 0보다 크면 흑자, 작으면 적자이다.
+# 미국 연방정부는 대부분의 해에 적자를 냈고, 흑자는 드물었다.
+# - 왼쪽: 1913~1933년. 제1차 세계대전 뒤 1920년대에 흑자가 이어졌다.
+# - 오른쪽: 1997년 이후. 1998~2001년에 흑자를 낸 뒤 다시 적자로 돌아섰다.
+# 두 그림 모두 경기침체 기간을 회색으로 칠한다.
+#
+# ## 결과물
+# pic_jpg/f44_gbalance.jpg, pic_tif/f44_gbalance.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 경기침체 기간(nber_recession), 그림 저장, FRED 자료 받기
+# - fred_api.py: fetch_fred_series가 실제로 들어 있는 파일(plot_def.py가 대신 불러온다)
+#
+# ## 자료 받기 (FRED)
+# - 연방정부 재정수지 (FYFSD), 회계연도 기준 연간 자료
 # %%
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 
 # Set font depending on the platform
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 

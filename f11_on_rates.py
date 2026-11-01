@@ -1,29 +1,27 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 11] 1일물 금리
-# ## required file
-#   - fred_api.py
-#   - plot_def.py
-#   - nyfed_api_rate_volume.py
+#
+# ## 이 코드가 하는 일
+# FRED와 뉴욕 연준에서 하루짜리(1일물) 금리 여러 개를 받아 한 그림에 그린다.
+#
+# ## 그림이 다루는 내용
+# 연준은 정책금리를 하나의 숫자가 아니라 범위(예: 4.25~4.50%)로 정한다.
+# 그리고 두 가지 금리로 시장 금리를 그 범위 안에 묶어 둔다.
+# - IORB: 은행이 연준에 맡긴 지급준비금에 연준이 주는 이자. 시장 금리의 위쪽 기준 역할을 한다.
+# - RRP 금리: MMF 등이 연준에 돈을 맡길 때 받는 금리. 시장 금리의 아래쪽 바닥 역할을 한다.
+# SOFR, TGCR(국채담보 레포 금리), EFFR(은행 간 무담보 금리)이 이 사이에서 움직이는 모습을 본다.
+#
+# ## 결과물
+# pic_jpg/f11_on_rates.jpg, pic_tif/f11_on_rates.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - fred_api.py: FRED 자료 받기
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - nyfed_api_all_rates.py: 뉴욕 연준 기준금리 받기(fetch_all_secured_rates)
 # %%
 import matplotlib.dates as mdates
 
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -41,12 +39,15 @@ from plot_def import *
 set_fonts()
 
 # %% [markdown]
-# ## Fetch data from FRED
-#   - IORB, SOFR, EFFR,
-#   - Fed Target upper bound and lower bound
-#   - O/N RRP rates: Overnight Reverse Repurchase Agreements Award Rate: Treasury Securities Sold by the Federal Reserve in the Temporary Open Market Operations (RRPONTSYAWARD)
-# ## New York Fed Markets Data API 에서 자료 추출
-#   - TGCR, EFFR trading volume
+# ## 자료 받기 (FRED)
+# - IORB, SOFR
+# - EFFR: 불러오지만 그림에는 아래 뉴욕 연준 자료의 EFFR을 쓴다.
+# - 정책금리 범위의 위쪽(DFEDTARU)과 아래쪽(DFEDTARL): 한 dataframe으로 합쳐 범위를 색칠한다.
+# - 연준 RRP 금리 (RRPONTSYAWARD)
+# ## 자료 받기 (뉴욕 연준 Markets Data)
+# - fetch_all_secured_rates()로 기준금리를 받아 TGCR과 EFFR을 고른다.
+# ## 기간
+# - 2024년 8월 1일부터 2025년 10월 31일까지
 # %%
 from fred_api import fetch_fred_series
 

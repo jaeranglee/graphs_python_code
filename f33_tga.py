@@ -1,31 +1,27 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 33] 미국 재무부 TGA잔고
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - fred_api.py
+#
+# ## 이 코드가 하는 일
+# FRED에서 재무부의 연준 예금(TGA) 잔액을 받아 2020년 이후를 그린다.
+#
+# ## 그림이 다루는 내용
+# TGA는 미국 재무부가 연준에 둔 예금 계좌로, 정부의 '지갑'이라고 할 수 있다.
+# 부채한도에 걸려 국채를 새로 발행하지 못하면 재무부는 TGA에 있는 돈을 꺼내 쓰므로 잔액이 줄어든다.
+# 부채한도 문제가 풀리면 국채를 발행해 TGA를 다시 채운다. 2025년 3월 19일 값을 점으로 강조한다.
+#
+# ## 결과물
+# pic_jpg/f33_tga.jpg, pic_tif/f33_tga.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - fred_api.py: FRED 자료 받기
 # %%
 import pandas as pd
 import matplotlib.pyplot as plt
 
 
 # Set font depending on the platform
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -50,8 +46,8 @@ end = "2025-12-31"
 from fred_api import fetch_fred_series
 
 # %% [markdown]
-# ## FRED 자료 추출
-# - D2WLTGAL (TGA Wednesday, NY FED)
+# ## 자료 받기 (FRED)
+# - TGA 잔액 (D2WLTGAL): 매주 수요일 기준, 백만 달러. 1000으로 나눠 10억 달러로 그린다.
 # %%
 df = fetch_fred_series("D2WLTGAL", start_date=start, end_date=end)
 

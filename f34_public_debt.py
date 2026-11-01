@@ -1,34 +1,34 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 34] 연방정부 부채한도와 총부채
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - treasury_debt_limit_api.py
-# ## data 디렉토리에 있어야 하는 파일
-# - Treasury Fiscal Data, DTS, Debt Subject to Limit Table 에서 미리 다운로드
-#   - DTS_DebtSubjLim_20051003_20250902.json
+#
+# ## 이 코드가 하는 일
+# 재무부 일일 재정보고서(DTS)의 부채한도 표를 읽어, 법정 부채한도와 실제 총부채를 함께 그린다.
+#
+# ## 그림이 다루는 내용
+# 미국은 의회가 정부가 빌릴 수 있는 돈의 상한(부채한도)을 법으로 정한다.
+# 총부채가 한도에 닿으면 정부는 새로 돈을 빌릴 수 없어 총부채 선이 한도에 붙어 평평해진다.
+# 의회가 한도를 올리거나 적용을 잠시 멈추면 총부채가 다시 늘어난다.
+#
+# ## 결과물
+# pic_jpg/f34_public_debt.jpg, pic_tif/f34_public_debt.tif
+#
+# ## 필요한 파일
+# - plot_def.py (defs): 한글 폰트 설정, 그림 저장
+# - treasury_debt_limit_api.py (defs): 부채한도 자료를 읽는 함수(fetch_debt_limit_json 등)
+# - data/DTS_DebtSubjLim_20051003_20250902.json: Treasury Fiscal Data의 DTS, Debt Subject to Limit 표를 미리 내려받은 파일
+#
+# ## 자료 가공
+# - 총부채 = 민간 보유 국채(Debt Held by the Public) + 정부 기관 보유 국채(Intragovernmental Holdings)
+# - 법정 부채한도(Statutory Debt Limit)와 날짜 기준으로 합친 뒤 1e6으로 나눠 조 달러로 그린다.
+# - API로 바로 받는 fetch_debt_limit()와 csv를 읽는 fetch_debt_limit_csv()도 코드에 문자열로 막아 두었다.
+#   API는 최신 자료를 받지만 시간이 오래 걸린다.
 # %%
 import pandas as pd
 import matplotlib.pyplot as plt
 
 
 # Set font depending on the platform
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 

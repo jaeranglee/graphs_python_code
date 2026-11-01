@@ -1,24 +1,26 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 50] 국가별 미국채 보유액과 순매입액
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - treasury_tic_api.py               : treasury TIC data fetch
+#
+# ## 이 코드가 하는 일
+# 미국 재무부 TIC(국제자본 통계) 자료를 내려받아 나라별 미국 국채 보유액과 순매입액을 그린다.
+#
+# ## 그림이 다루는 내용
+# 외국은 미국 국채의 큰 보유자이다. 일본, 영국, 중국이 얼마나 가지고 있는지,
+# 그리고 최근에 사고 있는지(순매입) 팔고 있는지(순매도) 본다.
+# - 왼쪽: 외국 전체(총액)와 그중 외국 정부·중앙은행(외국정부)의 보유액. 일본·영국·중국 보유액도 골라 두지만 그리지는 않는다.
+# - 오른쪽: 2021년 3월 이후 일본·영국·중국과 외국 전체의 순매입액
+#
+# ## 결과물
+# pic_jpg/f50_foreign_holdings.jpg, pic_tif/f50_foreign_holdings.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - treasury_tic_api.py: TIC 자료를 내려받는 함수
+#
+# ## 자료 받기
+# - download_tic_holdings_soup(): 나라별 보유액 표를 data/f_foreign_holdings1.xlsx로 받는다(이미 있으면 다시 받지 않는다).
+# - download_tic_sales_soup(): 나라별 순매입액 표를 data/TIC_data.xlsx로 받는다.
+# - 엑셀 표의 위쪽 설명 줄을 건너뛰고(skiprows) 필요한 나라만 골라낸다.
 # %%
 import pandas as pd
 
@@ -27,7 +29,7 @@ import matplotlib.ticker as ticker
 import matplotlib.dates as mdates
 
 
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -77,7 +79,7 @@ target_rows = target_rows.set_index("Country")
 
 reshaped = target_rows.transpose()
 reshaped.index.name = "Date"
-reshaped.reset_index(inplace=True)
+reshaped = reshaped.reset_index()
 
 reshaped.iloc[:, 1:] = reshaped.iloc[:, 1:].apply(pd.to_numeric)
 

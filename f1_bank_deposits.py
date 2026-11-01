@@ -1,30 +1,25 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
-# # [그림1] 은행예금 잔액과 은행업 ETF가격
-# 이번에는 Yahoo Finance가 제공하는 주식가격 자료를 불러보는 법을 알아본다.
-# 그리고 앞서 FRED API에서 자료를 호출하는 함수를 별도 파일로 저장했는데
-# 이 함수를 다른 파일에서 호출해서 사용하는 사례를 알아본다.
-# f1_baknk_deposits.py 파일을 열어보자. '[그림 1] 은행 예금잔액과 은행업 ETF가격'을 그려주는 코드이다.
+# # [그림 1] 은행예금 잔액과 은행업 ETF가격
 #
-# Yahoo Finance가 제공하는 주식가격 자료를 불러올 때 yfinance라는 파이썬 패키지를 활용한다.
-# yfinance는 Yahoo Finance API를 쉽게 이용할 수 있게 만들어 놓은 오픈소스 패키지이다.
-# yfinace 패키지를 호출하고 yf라고 정의한다. 다른 패키지들은 앞에 설명한 것과 동일하다.
-# 파이썬 코드는 파일을 새로 만들 때마다 필요한 패키지를 호출해야 한다.
+# ## 이 코드가 하는 일
+# 두 곳에서 자료를 받아 그림 두 개를 나란히 그린다.
+# - FRED(세인트루이스 연준의 경제통계 사이트)에서 미국 전체 은행과 중소은행의 예금 잔액을 받는다.
+# - Yahoo Finance에서 은행주를 묶은 ETF(S&P Banks ETF, 종목기호 KBE)의 주가를 받는다.
+#
+# ## 그림이 다루는 내용
+# 2022년 연준이 금리를 빠르게 올리자 예금이 은행을 떠나기 시작했고,
+# 2023년 3월 실리콘밸리은행(SVB)이 파산하면서 은행주 가격이 크게 떨어졌다.
+# 왼쪽 그림으로 예금이 줄어드는 모습을, 오른쪽 그림으로 은행주가 떨어지는 모습을 확인한다.
+#
+# ## 결과물
+# pic_jpg/f1_bank_deposits.jpg(화면용)와 pic_tif/f1_bank_deposits.tif(인쇄용)가 저장되고, 화면에도 그림이 나타난다.
+#
+# ## 이 코드에서 새로 배우는 것
+# 1. yfinance 패키지로 주식가격을 받는 방법
+# 2. 다른 파일(defs/fred_api.py)에 저장해 둔 함수를 불러와 쓰는 방법
+#
+# 첫 셀은 필요한 패키지를 불러온다. yfinance는 Yahoo Finance 자료를 쉽게 받게 해 주는 무료 패키지이며,
+# 관례에 따라 yf라는 짧은 이름으로 부른다. 파이썬은 파일마다 쓸 패키지를 처음에 불러와야 한다.
 # %%
 # %matplotlib inline
 
@@ -36,7 +31,9 @@ import matplotlib.pyplot as plt
 import yfinance as yf
 
 # %% [markdown]
-# 애플컴퓨터와 윈도우 컴퓨너에서 쓸 수 있는 폰트를 설정해 준다.
+# 그래프에 한글이 깨지지 않도록 폰트를 정한다.
+# 맥(Darwin)이면 AppleGothic, 윈도우면 맑은 고딕을 쓴다.
+# 마지막 줄은 음수 부호(-)가 네모로 깨져 보이는 것을 막는다.
 # %%
 
 if platform.system() == "Darwin":
@@ -46,9 +43,18 @@ else:
 plt.rcParams["axes.unicode_minus"] = False
 
 # %% [markdown]
-# fred_api.py라는 이름의 파일에서 fetch_fred_series라는 함수를 불러온다.
+# [그림 2]에서는 FRED 자료를 받는 함수를 코드 안에 직접 만들었다.
+# 이번에는 같은 일을 하는 함수를 따로 저장해 둔 파일에서 불러와 쓴다.
+# 여러 그림이 같은 함수를 쓰므로, 한곳에 두면 고칠 때도 한 번만 고치면 된다.
+#
+# - 공통 함수 파일은 이 폴더가 아니라 한 단계 위의 defs 폴더에 있다.
+#   처음 몇 줄은 defs 폴더를 찾아 파이썬이 그 안의 파일을 불러올 수 있게 한다.
+# - from fred_api import fetch_fred_series는 "fred_api.py 파일에서 fetch_fred_series 함수를 가져오라"는 뜻이다.
+# - fetch_fred_series(자료 이름, start_date=시작일, end_date=종료일)처럼 쓰면 dataframe(표 형태의 자료)을 돌려준다.
+#   첫째 열은 날짜(observation_date), 둘째 열은 자료 값이며 열 이름은 자료 이름과 같다.
+# - 시작일은 2022년 1월 1일, 종료일은 오늘(date.today())로 정해 가장 최근 자료까지 받는다.
 # %%
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -82,19 +88,18 @@ df0 = fetch_fred_series("DPSACBM027NBOG", start_date=start, end_date=end)
 df1 = fetch_fred_series("DPSSCBM027NBOG", start_date=start, end_date=end)
 
 # %% [markdown]
-# ### yfince 패키지에서 S&P Banks ETF 주가를 불러오는 곳이다.
-# S&P Banks ETF의 ticker, KBE를 yfinance 패키지에 주고 결과를 받아서, bkx라는 변수에 할당한다.
-# 개별 주식의 ticker는 검색엔진으로 미리 검색해 놓아야 한다. 정확한 ticker를 넣어야 오류없이 주식가격을 불러온다.
-# ticker는 미국 주식시장에 상장된 주식마다 붙어있는 식별기호이다.
+# ### yfinance로 은행주 ETF 가격 받기
+# ETF는 여러 주식을 묶어 하나의 주식처럼 거래하는 펀드이다. KBE는 미국 은행주들을 묶은 ETF라서
+# 은행업 전체의 주가 흐름을 보여준다.
 #
-# bkx에 할당된 자료중에 2022년 1월 1일부터 가장 최신 자료를 선별해서 data라는 변수에 할당한다.
-# data에 들어있는 자료에서 한번 더 2022년 1월 1일부터 2024년 12월 31일까지 자료를 선별했다.
-# 다음에 data변수에 있는 자료의 시작시기와 최종시기를 점검하고,
-# 자료의 처음 10개를 출력해서 확인한다.
+# 1. yf.Ticker("KBE")로 KBE 종목을 지정해 bkx라는 변수에 담는다.
+#    종목기호(ticker)는 미국 주식마다 붙은 짧은 이름이며, 정확히 적어야 오류 없이 자료가 온다.
+# 2. history(start=..., end=...)로 2022년 1월 1일부터 2025년 12월 31일까지의 가격을 받아 data에 담는다.
+# 3. 그중 2022년 1월 1일부터 2024년 12월 31일까지만 다시 골라낸다. 책의 그림과 같은 기간이다.
+# 4. 자료의 첫 날짜와 마지막 날짜, 그리고 처음 10줄을 출력해 제대로 받았는지 확인한다.
 #
-# 다른 주식가격을 알고 싶으면 해당 ticker를 KEB자리에 교체해서 넣으면 된다.
-# 자료 구간을 달리하려면 start, end 날짜를 바꾸면 된다. ticker와 날짜 모두 따옴표 또는 작은따옴표 안에 넣어야 한다.
-# 날짜는 yyyy-mm-dd 형식으로 넣어야 한다.
+# 다른 주식을 그리고 싶으면 KBE 자리에 그 종목기호를 넣으면 된다.
+# 기간을 바꾸려면 날짜를 'yyyy-mm-dd' 형식으로 따옴표 안에 적는다.
 # %%
 
 bkx = yf.Ticker("KBE")
@@ -115,22 +120,25 @@ data의 첫 번째 열의 이름은 Close이며 그 날짜의 주식 종가를 �
 """
 
 # %% [markdown]
-# 지금부터 선그래프를 그리는 코드라인이다. 먼저 그림을 정의해 준다. 1줄에 2개의 그래프가 그려진다. 첫째 그래프에 '은행 예금' 잔액과 '중소은행 예금' 잔액을 선그래프로 그리고,
-# 둘째 그래프에 'S&P Banks ETF'의 가격을 그린다.
+# 이제 그림을 그린다. plt.subplots(1, 2, ...)는 한 줄에 그림 두 개를 만든다는 뜻이다.
+# fig는 그림 전체, ax[0]은 왼쪽 그림, ax[1]은 오른쪽 그림이다.
+# figsize=(8, 4.5)는 가로 8인치, 세로 4.5인치이고, constrained_layout=True는 글자가 겹치지 않게 간격을 자동으로 맞춘다.
 # %%
 
 fig, ax = plt.subplots(1, 2, figsize=(8, 4.5), constrained_layout=True)
 
 
 # %% [markdown]
-# 첫 번째 그림이 그려지는 라인이 시작되었. FRED가 제공하는 예금잔액이 10억달러 단위로 되어 있어서 1e3 즉, 1,000으로
-# 나누어 1조 달러 단위로 바꾸어 그렸다. 첫 번째 그림은 y축을 왼쪽과 오른쪽에 그렸다. 전체 은행의 예금 잔액과
-# 중소은행의 예금잔액의 크기가 너무 차이가 나서 하나의 축만 사용하면 모양이 잘 안나오기 때문이다.
-# 첫째 줄이 의미하는 것은 다음과 같다.
-# ax_left는 왼쪽 y축이며 ax[0]의 왼쪽 y축에 할당된다.
-# ax_right는 오른쪽 y 축이하며 ax[0]의 ax_left와 쌍을 이룬다.
-# 첫째 그래프의 x 축에는 df0의 날짜가, 왼쪽 y축에는 df0에 할당된 전체 은행 예금이 그려진다.
-# 첫째 그래프의 오른 쪽 y축에는 df1에 할당된 중소은행 예금이 그려진다. x축에는 df1의 날짜가 사용된다.
+# ### 왼쪽 그림: 전체 은행 예금과 중소은행 예금
+# 전체 은행 예금은 약 17조 달러, 중소은행 예금은 그보다 훨씬 작다.
+# 한 개의 y축에 같이 그리면 작은 쪽의 움직임이 거의 보이지 않으므로 y축을 왼쪽과 오른쪽에 하나씩 둔다.
+#
+# - ax_left = ax[0]: 왼쪽 y축(전체 은행 예금)
+# - ax_right = ax_left.twinx(): x축은 함께 쓰고 y축만 오른쪽에 하나 더 만든다(중소은행 예금).
+# - FRED 자료는 10억 달러 단위라서 1e3(=1,000)으로 나누어 조 달러 단위로 바꾼다.
+# - 중소은행 예금은 점선(ls="--")으로 그려 구별한다.
+# - 축이 두 개라 범례도 두 개가 생기므로, 두 범례를 하나로 합쳐 왼쪽 위에 놓는다.
+# - 그림 위쪽 양옆에 단위 (조 달러)를, 아래에 출처를 적는다.
 # %%
 
 ax_left = ax[0]
@@ -156,8 +164,10 @@ ax_right.plot(
 # 첫 번째 그래프의 x축 날짜 간격, 선그래프 라벨, 단위표시, 자료출처 표시를 지정하는 곳이다.
 
 ax[0].xaxis.set_major_locator(mdates.YearLocator())
-ax_left.legend(loc="upper left", bbox_to_anchor=(0.2, 1.0))
-ax_right.legend(loc="upper left", bbox_to_anchor=(0.2, 0.94))
+# 두 축의 범례를 하나로 합친다.
+h1, l1 = ax_left.get_legend_handles_labels()
+h2, l2 = ax_right.get_legend_handles_labels()
+ax_left.legend(h1 + h2, l1 + l2, loc="upper left")
 ax_left.yaxis.label.set_visible(True)
 ax_left.text(
     0,
@@ -186,10 +196,10 @@ ax[0].grid(False)
 
 
 # %% [markdown]
-# 두 번째 그래프를 그려보는 라인이다. 첫 번째 그래프의 오른쪽에 나오게 된다. yfinance 패키지로 불러온 S&P Banks ETF 가격을 그려준다.
-# x축이 날짜, y축이 주식가격이다. 앞에서 print()로 확인했듯이 yfinance 패키지로 불러온 자료의 날짜는
-# 열(column)에 저장되어 있지 않고 각 행의 index로 지정되어 있다. 그래서 x축을 data.index로 할당한 것이다.
-# 1개의 자료만 그리기 때문에 y축도 당연히 1개이다.
+# ### 오른쪽 그림: S&P Banks ETF 가격
+# x축에 날짜, y축에 종가(Close, 그날 마지막으로 거래된 가격)를 놓고 선그래프를 그린다.
+# 앞에서 출력해 본 것처럼 yfinance 자료는 날짜가 열이 아니라 각 줄의 이름(index)으로 들어 있다.
+# 그래서 x축에 data.index를 넣는다.
 # %%
 
 ax[1].plot(data.index, data["Close"], label="S&P Banks ETF", color="blue", lw=2)
@@ -221,39 +231,56 @@ ax[1].text(
 ax[1].grid(False)
 
 # %% [markdown]
-# 그림을 파일로 저장하는 단계이다. 먼저 그림을 저장하기 위해 필요한 os, Image 패키지가 호출된다.
-# 설치되어 있지 않다면, 이번에 새로 설치해야 한다. 이 파일의 이름을 base_filename 변수에 할당한다.
-# 이 파일의 경우 f1_bank_deposits가 base_filename에 할당된다.
+# ### 그림 저장
+# 다른 그림 코드들은 마지막 줄의 plot_save() 한 줄로 그림을 저장한다(defs/plot_def.py).
+# 이 파일은 저장 과정을 보여주려고 plot_save()가 하는 일을 코드에 그대로 풀어 적었다. 결과 파일도 같다.
+# 1. 이 파일의 이름(f1_bank_deposits)을 그대로 그림 파일 이름으로 쓴다.
+# 2. pic_tif, pic_jpg 폴더가 없으면 만든다.
+# 3. y축 숫자에 세 자리마다 쉼표를 넣는다. 소수점 자리수는 눈금 값에 맞춰 정한다.
+#    예: 눈금이 1000, 2000이면 '1,000', '2,000' / 2.5, 3.0이면 '2.5', '3.0'
+# 4. 해상도 300dpi로 tif와 jpg 두 가지로 저장한다. tif는 LZW 방식으로 압축한다.
+#    LZW는 화질을 그대로 두고 파일 크기만 줄이는 압축이다(무손실 압축, 크기 약 1/10).
+# 5. jpg를 RGB 색 체계로 바꿔 다시 저장한다. RGB는 모니터에서 쓰는 빨강·초록·파랑 색 체계이다.
+# 6. plt.show()로 그림을 화면에 띄운다.
+#
+# os는 파일과 폴더를 다루는 기본 모듈이고, PIL(Image)은 그림 파일을 다루는 패키지이다(pip install pillow).
 # %%
 
 import os
 
+from matplotlib.ticker import StrMethodFormatter
 from PIL import Image
 
-# 저장 경로를 설정하고 파일 이름을 정해준다.
+# 1. 그림 파일 이름 = 이 .py 파일 이름
 try:
     base_filename = os.path.splitext(os.path.basename(__file__))[0]
-except NameError:
-    base_filename = "default_filename"
+except NameError:  # jupyter처럼 __file__이 없을 때
+    base_filename = "f1_bank_deposits"
 
-# 저장 경로를 설정하고 파일 이름을 정해준다.
-image_path = f"pic_tif/{base_filename}.tif"
+image_path_tif = f"pic_tif/{base_filename}.tif"
 image_path_jpg = f"pic_jpg/{base_filename}.jpg"
 
-# 저장 경로가 없으면 자동으로 생성하도록 했다.
+# 2. 저장 폴더가 없으면 만든다.
 os.makedirs("pic_tif", exist_ok=True)
 os.makedirs("pic_jpg", exist_ok=True)
 
+# 3. 모든 y축에 천 단위 쉼표. 눈금 값을 정확히 나타내는 가장 적은 소수점 자리수(0~6)를 고른다.
+for a in plt.gcf().axes:
+    ticks = a.get_yticks()
+    d = 0
+    while d < 6 and any(abs(t - round(t, d)) > 1e-9 * max(1.0, abs(t)) for t in ticks):
+        d += 1
+    a.yaxis.set_major_formatter(StrMethodFormatter(f"{{x:,.{d}f}}"))
 
-# 그래프를 파일로 저장한다.
-plt.savefig(image_path, dpi=300)
+# 4. 300dpi로 저장. tif는 무손실 LZW 압축
+plt.savefig(image_path_tif, dpi=300, pil_kwargs={"compression": "tiff_lzw"})
 plt.savefig(image_path_jpg, dpi=300)
 
-# 그래프를 저장한 그림파일의 색공간을 JPEG와 CMYK로 각각 변환한다. JPEG는 주로 모니터 출력용, CMYK는 인쇄용으로 사용된다.
-# 마지막 줄이 그래프를 모니터로 보여준다.
-#
-img = Image.open(image_path_jpg).convert("CMYK")
+# 5. jpg를 RGB로 바꿔 다시 저장
+img = Image.open(image_path_jpg).convert("RGB")
 img.save(image_path_jpg, "JPEG")
+
+# 6. 화면에 띄우기
 plt.show()
 
 # %%

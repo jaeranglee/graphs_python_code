@@ -1,26 +1,31 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 49] TPU, 소비자심리지수, 구글트렌드
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - treasury_buybacks_api.py  : Treasury Fiscal Data, Treasury Buybacks Data Fetch
-# ## data 디렉토리에 필요한 파일
-#   - f_google_trend_recession.csv
+#
+# ## 이 코드가 하는 일
+# FRED에서 무역정책 불확실성지수와 소비자심리지수를 받고, 구글 트렌드 csv를 읽어 그림 두 개를 나란히 그린다.
+#
+# ## 그림이 다루는 내용
+# - 왼쪽: TPU(무역정책 불확실성지수)는 신문 기사에 무역정책 관련 불확실성 단어가 얼마나 나오는지로 만든 지수이다.
+#   2025년 관세 정책이 쏟아지자 크게 뛰었고, 같은 시기 미시건대 소비자심리지수는 떨어졌다.
+# - 오른쪽: 구글에서 'recession'(경기침체)을 검색한 정도. 경기에 대한 사람들의 걱정을 보여준다.
+#
+# ## 결과물
+# pic_jpg/f49_tpu.jpg, pic_tif/f49_tpu.tif
+#
+# ## 필요한 파일
+# - plot_def.py (defs): 한글 폰트 설정, 그림 저장
+# - fred_api.py (defs): FRED 자료 받기
+# - data/f_google_trend_recession.csv: 구글 트렌드에서 'recession'(미국) 검색 지수를 내려받은 파일
+#
+# ## 자료 받기 (FRED)
+# - 무역정책 불확실성지수 (EPUTRADE): 왼쪽 y축
+# - 미시건대 소비자심리지수 (UMCSENT): 오른쪽 y축
+# - 경제정책 불확실성지수 (USEPUINDXD): 불러오지만 그림에는 쓰지 않는다.
+#
+# ## 그리기
+# - 왼쪽 그림은 두 축의 범례를 하나로 합친다. 범례를 놓을 빈자리가 없어서 y축 위쪽을 넓혀
+#   (왼쪽 11,000, 오른쪽 88까지) 비운 자리(왼쪽 위)에 범례를 둔다.
+# - 오른쪽 그림은 2024년 이후 구글 트렌드 지수이다.
 # %%
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -29,7 +34,7 @@ import matplotlib.dates as mdates
 
 
 # Set font depending on the platform
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -76,7 +81,7 @@ ax_right = ax_left.twinx()  # Create right-side y-axis
 ax_left.plot(
     df2["observation_date"],
     df2["EPUTRADE"],
-    label="경제정책 불확실성지수(좌측)",
+    label="무역정책 불확실성지수(좌측)",
     color="blue",
     lw=2,
 )
@@ -124,8 +129,12 @@ ax_right.text(
     transform=ax[0].transAxes,
 )
 
-ax_left.legend(loc="upper left", bbox_to_anchor=(0, 0.5))
-ax_right.legend(loc="upper left", bbox_to_anchor=(0, 0.44))
+# 두 축의 범례를 하나로 합치고, y축 위쪽을 넓혀 비운 자리에 범례를 둔다.
+ax_left.set_ylim(top=11000)
+ax_right.set_ylim(top=88)
+h1, l1 = ax_left.get_legend_handles_labels()
+h2, l2 = ax_right.get_legend_handles_labels()
+ax_left.legend(h1 + h2, l1 + l2, loc="upper left")
 
 plt.grid(False)
 # plt.tight_layout()

@@ -1,30 +1,25 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 31] 주요 국채 보유주체
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - fred_api.py
+#
+# ## 이 코드가 하는 일
+# FRED에서 누가 미국 국채를 얼마나 가지고 있는지 받아 한 그림에 그린다.
+#
+# ## 그림이 다루는 내용
+# 연준의 자금순환표(Financial Accounts of the United States)는 경제 주체별로 어떤 자산을 얼마나 가졌는지 정리한 통계이다.
+# 외국, 가계, MMF, 연금, 보험회사가 가진 미국 국채가 1990년 이후 어떻게 변해 왔는지 비교한다.
+#
+# ## 결과물
+# pic_jpg/f31_treasury_holders.jpg, pic_tif/f31_treasury_holders.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - fred_api.py: FRED 자료 받기
 # %%
 import pandas as pd
 import matplotlib.pyplot as plt
 
 # Set font depending on the platform
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -42,29 +37,20 @@ from plot_def import *
 set_fonts()
 
 # %% [markdown]
-# ## Fetch data from FRED
-# - Households and Nonprofit Organizations; Treasury Securities; Asset, Level (HNOTSAQ027S)
-#   - in Million dollars
-# - Households and Nonprofit Organizations; Treasury Securities; Asset, Market Value Levels (BOGZ1LM153061105Q)
-#   - in Million dollars
-# - Pension Funds; Treasury Securities; Asset, Level (BOGZ1FL593061105Q)
-#   - in Million dollars
-# - Rest of the World; Treasury Securities Held by Foreign Official Institutions; Asset, Level (BOGZ1FL263061130Q)
-#   - in Million dollars
-# - Rest of the World; Treasury Securities; Asset, Level (ROWTSEQ027S)
-#   - in Million dollars
-# - Rest of the World; Treasury Securities; Asset, Market Value Levels (BOGZ1LM263061105Q)
-#   - in Million dollars
-# - Insurance Companies; Treasury Securities; Asset, Level (BOGZ1FL523061105Q)
-#   - in Million dollars
-# - Money Market Funds; Treasury Securities; Asset, Level (BOGZ1FL633061105Q)
-#   - in Million dollars
-# - Mutual Funds; Treasury Securities; Asset (Market Value), Level (BOGZ1FL653061105Q)
-#   - in Million dollars
-# - Domestic Financial Sectors; Treasury Securities; Asset, Level (FBTSAAQ027S)
-#   - in Million dollars
-# - Nonfinancial Corporate Business; Treasury Securities; Asset, Level (TSABSNNCB)
-#   - in Billion dollars
+# ## 자료 받기 (FRED, 분기 자료, 백만 달러)
+# 그림에 쓰는 자료는 아래 다섯 가지이다. 1e6으로 나눠 조 달러로 그린다.
+# - 외국 전체 (ROWTSEQ027S)
+# - 가계와 비영리단체 (HNOTSAQ027S)
+# - MMF (BOGZ1FL633061105Q)
+# - 연금 (BOGZ1FL593061105Q)
+# - 보험회사 (BOGZ1FL523061105Q)
+#
+# series_ids에 추가하면 함께 그려 볼 수 있는 자료
+# - 가계 보유 국채의 시장가치 (BOGZ1LM153061105Q)
+# - 외국 공적기관(중앙은행 등) 보유 (BOGZ1FL263061130Q)
+# - 외국 보유 국채의 시장가치 (BOGZ1LM263061105Q)
+# - 뮤추얼펀드 (BOGZ1FL653061105Q), 국내 금융기관 전체 (FBTSAAQ027S): 코드에 주석으로 남겨 두었다.
+# - 비금융 기업 (TSABSNNCB): 단위가 10억 달러라서 1e3으로 나눠야 한다.
 # %%
 start = "1990-01-01"
 end = "2025-09-01"
@@ -106,7 +92,7 @@ all_data = {}
 for term, sid in series_ids.items():
     df = fetch_fred_series(sid, start_date=start, end_date=end)
 
-    df.rename(columns={df.columns[-1]: "value"}, inplace=True)
+    df = df.rename(columns={df.columns[-1]: "value"})
     all_data[term] = df.set_index("observation_date")["value"]
 
 # 병합

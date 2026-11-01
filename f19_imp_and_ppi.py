@@ -1,24 +1,26 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 19] 수입물가와 생산자물가
-# ## required file
-#   - plot_def.py
-#   - fred_api.py
+#
+# ## 이 코드가 하는 일
+# FRED에서 수입물가지수와 생산자물가지수를 받아 상승률을 계산하고 그림 두 개를 나란히 그린다.
+#
+# ## 그림이 다루는 내용
+# - 수입물가: 미국이 외국에서 사 오는 상품의 가격. 달러 가치와 국제 원자재 가격의 영향을 받는다.
+# - 생산자물가: 기업이 생산해 파는 상품의 가격. 시간이 지나 소비자물가에 반영되는 경우가 많아 소비자물가의 선행지표로 본다.
+# - 왼쪽: 전년동월대비 상승률, 오른쪽: 전월대비 상승률
+# 2021년 이후를 그리고, 2024년 8월 값을 점으로 강조한다.
+#
+# ## 결과물
+# pic_jpg/f19_imp_and_ppi.jpg, pic_tif/f19_imp_and_ppi.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - fred_api.py: FRED 자료 받기
+#
+# ## 자료 받기 (FRED)
+# - 수입물가지수, 전체 상품 (IR)
+# - 생산자물가지수, 전체 상품 (PPIACO)
+# - pct_change(12)로 전년동월대비, pct_change()로 전월대비 상승률을 구한다.
 # %%
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -26,7 +28,7 @@ import matplotlib.dates as mdates
 import matplotlib.ticker as ticker
 
 # 한글 폰트 설정
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 

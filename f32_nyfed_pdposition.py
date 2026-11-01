@@ -1,25 +1,20 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 32] 프라이머리 딜러 국채 포지션
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - fred_api.py
-#   - nyfed_api.py
+#
+# ## 이 코드가 하는 일
+# 뉴욕 연준에서 프라이머리 딜러의 국채 보유 자료를 받아 만기별로 그린다.
+#
+# ## 그림이 다루는 내용
+# 프라이머리 딜러는 연준과 직접 거래하고 국채 경매에 반드시 참여해야 하는 대형 금융회사이다.
+# 국채 발행이 늘어 딜러들이 팔지 못한 국채를 많이 떠안으면 보유액(포지션)이 커진다.
+# 보유액이 너무 커지면 딜러가 국채를 더 사기 어려워져 국채시장의 거래가 원활하지 않을 수 있다.
+#
+# ## 결과물
+# pic_jpg/f32_nyfed_pdposition.jpg, pic_tif/f32_nyfed_pdposition.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - nyfed_api.py: 시계열 목록 받기(fetch_series_list), 딜러 포지션 받기(fetch_pdpositions)
 # %%
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -27,7 +22,7 @@ import matplotlib.pyplot as plt
 
 # 폰트 설정
 
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -44,9 +39,13 @@ from plot_def import *
 
 set_fonts()
 # %% [markdown]
-# ## New York Fed Markets Data API 에서 자료 추출
-# - PD Position all timeseries securities list description download
-# - run it for just one time to check the list
+# ## 자료 받기 (뉴욕 연준 Markets Data)
+# 1. fetch_series_list(): 어떤 시계열이 있는지 목록과 설명을 받아 data/nyfed_pdposition.csv로 저장한다.
+#    목록을 확인하는 용도라서 한 번만 실행해 보면 된다.
+# 2. fetch_pdpositions(): 딜러 포지션 전체 시계열을 받아 data/TimeSeries.csv로 저장한다.
+# 3. 저장한 csv를 읽어 Time Series 열의 코드로 필요한 자료를 고른다.
+#    - 국채 전체, 단기국채(Bills), 중기국채(만기 11년 이하 구간을 더한 것), 장기국채(만기 11년 초과)
+#    - 값은 백만 달러이며 1e3으로 나눠 10억 달러로 그린다.
 # %%
 from nyfed_api import fetch_series_list
 

@@ -1,31 +1,29 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
-# # [그림3] CRE 대출, 주택대출, CRE가격과 공동주택가격 상승률
-# ## required file
-#   - fred_api.py
-#   - plot_def.py
+# # [그림 3] CRE 대출, 주택대출, CRE가격과 공동주택가격 상승률
+#
+# ## 이 코드가 하는 일
+# FRED에서 은행 대출과 부동산 가격 자료를 받아 그림 세 개를 나란히 그린다.
+#
+# ## 그림이 다루는 내용
+# CRE(Commercial Real Estate, 상업용 부동산)는 사무실, 상가, 호텔 같은 건물이다.
+# 코로나 이후 재택근무가 늘면서 사무실이 비고 CRE 가격이 떨어졌다. CRE 대출을 많이 가진 은행, 특히 중소은행의 부실 우려가 커졌다.
+# - 왼쪽: 상업은행의 CRE 대출 잔액과, 그중 중소은행이 차지하는 비중
+# - 가운데: 주택대출 잔액과, 그중 중소은행 비중
+# - 오른쪽: CRE 가격과 공동주택(아파트 등 다가구 주택) 가격의 1년 전 대비 상승률
+#
+# ## 결과물
+# pic_jpg/f3_cre.jpg, pic_tif/f3_cre.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정(set_fonts), 그림 저장(plot_save), FRED 자료 받기(fetch_fred_series)
+# - fred_api.py: fetch_fred_series가 실제로 들어 있는 파일(plot_def.py가 대신 불러온다)
 # %%
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 # #폰트 설정
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -49,14 +47,24 @@ end = "2025-10-01"
 # ##상업은행 CRE대출
 
 # %% [markdown]
-# ## Fetch data from FRED
-#   - Real Estate Loans: Residential Real Estate Loans, All Commercial Banks (RREACBW027SBOG):
-#   - 상업은행 CRE대출 : RREACBW027SBOG
-#   - 상업은행 총자산 : TOTBKCR
-#   - Real Estate Loans: Commercial Real Estate Loans, Small Domestically Chartered Commercial Banks (CRESCBW027SBOG)
-#   - Real Estate Loans: Residential Real Estate Loans, Small Domestically Chartered Commercial Banks (RRESCBW027NBOG)
-#   - CRE가격 변화율: 'COMREPUSQ159N'
-#   - 공동주택 가격: 'BOGZ1FL075035403Q'
+# ## 자료 받기 (FRED)
+# 괄호 안은 FRED의 자료 이름(series id)이다.
+# - 상업은행 CRE 대출 (CREACBW027SBOG)
+# - 상업은행 주택대출 (RREACBW027SBOG)
+# - 상업은행 총신용 (TOTBKCR): 불러와서 합쳐 두지만 그림에는 쓰지 않는다.
+# - 중소은행 CRE 대출 (CRESCBW027SBOG)
+# - 중소은행 주택대출 (RRESCBW027SBOG)
+# - CRE 가격의 1년 전 대비 변화율 (COMREPUSQ159N, IMF 자료)
+# - 공동주택 가격 (BOGZ1FL075035403Q, 분기 자료): pct_change(4)로 4분기 전, 즉 1년 전 대비 상승률을 계산한다.
+#
+# ## 자료 가공
+# - pd.merge로 대출 자료들을 날짜 기준으로 합친다.
+# - 중소은행 비중(%) = 중소은행 대출 / 전체 상업은행 대출 x 100
+# - 대출 잔액은 10억 달러 단위라서 1e3(=1,000)으로 나눠 조 달러로 그린다.
+#
+# ## 그리기
+# 왼쪽과 가운데 그림은 대출 잔액(왼쪽 y축)과 중소은행 비중(오른쪽 y축)을 함께 그린다.
+# 두 축의 범례를 하나로 합쳐 선과 겹치지 않는 오른쪽 아래에 둔다.
 # %%
 
 df_cre = fetch_fred_series("CREACBW027SBOG", start_date=start, end_date=end)
@@ -108,8 +116,10 @@ ax_right.plot(
     color="black",
     lw=2,
 )
-ax_left.legend(loc="upper left", bbox_to_anchor=(0.2, 0.23))
-ax_right.legend(loc="upper left", bbox_to_anchor=(0.2, 0.16))
+# 두 축의 범례를 하나로 합친다.
+h1, l1 = ax_left.get_legend_handles_labels()
+h2, l2 = ax_right.get_legend_handles_labels()
+ax_left.legend(h1 + h2, l1 + l2, loc="lower right")
 
 
 ax[0].xaxis.set_major_locator(mdates.YearLocator())
@@ -159,8 +169,10 @@ ax_right1.plot(
     lw=2,
 )
 
-ax_left1.legend(loc="upper left", bbox_to_anchor=(0.2, 0.23))
-ax_right1.legend(loc="upper left", bbox_to_anchor=(0.2, 0.16))
+# 두 축의 범례를 하나로 합친다.
+h1, l1 = ax_left1.get_legend_handles_labels()
+h2, l2 = ax_right1.get_legend_handles_labels()
+ax_left1.legend(h1 + h2, l1 + l2, loc="lower right")
 
 
 ax[1].xaxis.set_major_locator(mdates.YearLocator())

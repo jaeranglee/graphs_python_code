@@ -1,34 +1,33 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 41] 1일물 단기자금 거래 규모
 # # [그림 42] EFFR 수준과 금리 분포
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - fred_api.py
-#   - nyfed_api_all_rates.py    : NY Fed Markets Data, for all overnight rates
-#   - nyfed_api_rate_volume.py  : NY Fed Markets Data, for all overnight rate volume
+#
+# ## 이 코드가 하는 일
+# 뉴욕 연준에서 하루짜리 금리와 거래량을, FRED에서 IORB와 정책금리 범위를 받아 그림 두 장을 그린다.
+#
+# ## 그림이 다루는 내용
+# - 그림 41: 하루짜리 자금시장 세 곳의 거래량. SOFR와 TGCR은 국채를 담보로 한 레포 시장,
+#   EFFR은 담보 없이 은행끼리 빌려주는 연방기금시장이다. 지금은 레포 시장이 훨씬 크다.
+# - 그림 42: EFFR이 정책금리 범위 안, IORB 아래에서 움직이는 모습과, 그날 거래 금리가 퍼진 정도(백분위)
+#
+# ## 결과물
+# pic_jpg/f41_effr_iorb_1.jpg(그림 41), pic_jpg/f41_effr_iorb_2.jpg(그림 42), 같은 이름의 tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - fred_api.py: FRED 자료 받기(IORB, 정책금리 범위)
+# - nyfed_api_all_rates.py: 뉴욕 연준 하루짜리 금리 받기
+# - nyfed_api_rate_volume.py: 뉴욕 연준 하루짜리 금리의 거래량 받기
+#
+# ## 그리기
+# - 그림 42의 범례는 선이 없는 오른쪽 위에 둔다.
 # %%
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 
 # 폰트 설정
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -68,8 +67,8 @@ from nyfed_api_rate_volume import fetch_all_secured_rates_vol
 df_all = fetch_all_secured_rates(start_date=start, end_date=end)
 df_vol_all = fetch_all_secured_rates_vol(start_date=start, end_date=end)
 
-df_all.rename(columns={"Date": "observation_date"}, inplace=True)
-df_vol_all.rename(columns={"Date": "observation_date"}, inplace=True)
+df_all = df_all.rename(columns={"Date": "observation_date"})
+df_vol_all = df_vol_all.rename(columns={"Date": "observation_date"})
 
 # tgcr, sofr, bgcr, sofrai, effr, obfr 등 선택가능
 
@@ -178,7 +177,7 @@ for i in [1, 2]:
             label=None,
         )
 
-        ax.legend(loc="upper right", bbox_to_anchor=(1, 0.7))
+        ax.legend(loc="upper right")
         ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m"))
         ax.text(

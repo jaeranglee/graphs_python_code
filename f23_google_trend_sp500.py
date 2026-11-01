@@ -1,28 +1,23 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 23] 미국 예외주의에 대한 구글 트렌드와 S&P500
-# ## required file
-#   - plot_def.py
-#   - fred_api.py
-# ## data 디렉토리에 필요한 파일
-#   - f_google_trend.csv : 구글 트렌드
+#
+# ## 이 코드가 하는 일
+# 구글 트렌드 csv 파일과 FRED의 S&P500 지수를 읽어 한 그림에 그린다(y축 두 개).
+#
+# ## 그림이 다루는 내용
+# '미국 예외주의(American Exceptionalism)'는 미국 경제와 주식시장이 다른 나라보다 계속 앞설 것이라는 생각이다.
+# 구글 트렌드는 어떤 단어가 얼마나 많이 검색됐는지를 0~100 지수로 보여준다.
+# 이 말의 검색이 늘어난 시기와 미국 주가(S&P500)의 흐름을 비교한다.
+#
+# ## 결과물
+# pic_jpg/f23_google_trend_sp500.jpg, pic_tif/f23_google_trend_sp500.tif
+#
+# ## 필요한 파일
+# - plot_def.py (defs): 한글 폰트 설정, 그림 저장
+# - fred_api.py (defs): FRED 자료 받기
+# - data/f_google_trend.csv: 구글 트렌드에서 'American Exceptionalism'(전 세계) 월별 검색 지수를 내려받은 파일
 # %%
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -49,8 +44,12 @@ end = "2025-12-31"
 from fred_api import fetch_fred_series
 
 # %% [markdown]
-# ## Fetch data from FRED
-#   - S&P 500 (SP500)
+# ## 자료 받기
+# - FRED: S&P 500 지수 (SP500)
+# - csv: 앞의 두 줄은 설명이라 skiprows=2로 건너뛰고 읽는다. 열 이름을 Date, Google_Trend로 바꾼다.
+# ## 그리기
+# - 두 자료 모두 2021년 1월부터 2025년 6월까지 골라낸다.
+# - 왼쪽 y축에 구글 트렌드, 오른쪽 y축에 S&P500을 그린다.
 # %%
 df_sp = fetch_fred_series("SP500", start_date=start, end_date=end)
 

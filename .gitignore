@@ -1,0 +1,23 @@
+# 공개 저장소에 올리지 않는 파일
+# API 키: defs/.env.example을 defs/.env로 복사해 키를 적는다. .env는 올리지 않는다.
+.env
+*.env
+
+# 실행하면 생기는 것: 자료 캐시, 그림 파일
+cache/
+*_cache/
+pic_jpg/
+pic_tif/
+pic_gif/
+*.tif
+*.tiff
+*.jpg
+*.jpeg
+
+# 파이썬·편집기
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+.idea/
+.vscode/
+.DS_Store

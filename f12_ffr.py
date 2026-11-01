@@ -1,27 +1,22 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 12] 연방기금금리와 정책금리
-# ## required file
-#   - fred_api.py
-#   - plot_def.py
-#   - nyfed_api_rate_volume.py
+#
+# ## 이 코드가 하는 일
+# FRED에서 실효연방기금금리와 정책금리 범위를 받아 한 그림에 그린다.
+#
+# ## 그림이 다루는 내용
+# 연방기금금리는 미국 은행들이 서로 하루 동안 돈을 빌려줄 때의 금리이고, 연준은 이 금리의 목표 범위를 정한다.
+# 실효연방기금금리(실제 거래된 평균 금리)가 2022년 이후 금리 인상과 인하 과정에서
+# 목표 범위 안에 머무는 모습을 본다.
+#
+# ## 결과물
+# pic_jpg/f12_ffr.jpg, pic_tif/f12_ffr.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - fred_api.py: FRED 자료 받기
+# - plot_def.py: 한글 폰트 설정, 그림 저장
 # %%
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -38,11 +33,9 @@ from plot_def import *
 
 set_fonts()
 # %% [markdown]
-# ## Fetch data from FRED
-#   - EFFR,
-#   - Fed Target upper bound and lower bound
-# ## New York Fed Markets Data API 에서 자료 추출
-#   - TGCR, EFFR trading volume
+# ## 자료 받기 (FRED)
+# - 실효연방기금금리 (RIFSPFFNB): 선으로 그린다.
+# - 정책금리 범위의 위쪽(DFEDTARU)과 아래쪽(DFEDTARL): 두 값 사이를 색칠한다(fill_between).
 # %%
 start = "2022-01-01"
 end = "2025-12-31"

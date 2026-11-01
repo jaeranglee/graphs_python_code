@@ -1,25 +1,25 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 45] 미국채 수익률
 # # [그림 46] 연준의 미국채 보유액
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - fred_api.py
+#
+# ## 이 코드가 하는 일
+# FRED에서 국채금리와 연준의 국채 보유액을 받아 그림 두 개를 나란히 그린다.
+#
+# ## 그림이 다루는 내용
+# - 왼쪽(그림 45): 10년물과 2년물 국채금리. 2002년 이후의 긴 흐름을 본다.
+# - 오른쪽(그림 46): 연준이 가진 국채 전체와 그중 중장기국채
+# - 음영은 재무부가 국채 바이백(이미 발행한 국채를 만기 전에 되사는 것)을 다시 시작한 2024년 5월 이후이다.
+#
+# ## 결과물
+# pic_jpg/f45_tb_yield_fed_tb_holdings.jpg, pic_tif/f45_tb_yield_fed_tb_holdings.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장, FRED 자료 받기
+# - fred_api.py: fetch_fred_series가 실제로 들어 있는 파일(plot_def.py가 대신 불러온다)
+#
+# ## 자료 받기 (FRED)
+# - 10년만기 국채금리 (DGS10), 2년만기 국채금리 (DGS2)
+# - 연준 보유 국채 합계 (WSHOTSL), 연준 보유 중장기국채 (WSHONBNL): 백만 달러를 1e6으로 나눠 조 달러로 그린다.
 # %%
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -27,7 +27,7 @@ import matplotlib.dates as mdates
 
 
 # 폰트 설정
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 

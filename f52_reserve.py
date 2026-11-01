@@ -1,24 +1,30 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 52] 전세계 외환보유액의 주요 통화별 구성
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - imf_api.py        : IMF Data, no api key required
+#
+# ## 이 코드가 하는 일
+# IMF에서 세계 외환보유액을 통화별로 받아 그림 두 개를 나란히 그린다.
+#
+# ## 그림이 다루는 내용
+# 외환보유액은 각 나라 중앙은행이 위기에 대비해 가지고 있는 외화 자산이다.
+# IMF의 COFER 통계는 이 외환보유액이 어떤 통화(달러, 유로, 엔, 파운드, 위안 등)로 되어 있는지 보여준다.
+# 달러 비중은 1999년 70%를 넘었으나 2025년에는 60% 아래로 내려왔다. 그래도 여전히 가장 큰 비중이다.
+# - 왼쪽: 통화별 비중(%)을 쌓은 면적 그래프
+# - 오른쪽: 통화별 보유 금액(조 달러)
+#
+# ## 결과물
+# pic_jpg/f52_reserve.jpg, pic_tif/f52_reserve.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - imf_api.py: IMF 자료 받기(API key 필요 없음)
+#
+# ## 자료 받기 (IMF COFER, 1999년 1분기 ~ 2025년 1분기)
+# - 금액: fetch_cofer_data(통화 코드, "NV_USD", ...)
+# - 비중: fetch_imf_data(..., unit_id="SHRO_PT", cycle="Q"). 같은 자료를 받지만 두 함수는 인자 이름이 다르다.
+# - 기타 = 100 - 다섯 통화 비중의 합
+#
+# ## 그리기
+# - 왼쪽 면적 그래프는 그림을 꽉 채우므로, 범례를 한 가지 색으로 된 아래쪽 USD 영역에 3열로 둔다.
 # %%
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -28,7 +34,7 @@ from matplotlib.ticker import FuncFormatter
 # 한글 폰트 설정
 
 # Set font depending on the platform
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -78,7 +84,7 @@ dfs_share = []
 
 for name, code in currencies.items():
     df_usd = fetch_cofer_data(code, "NV_USD", start_period=start, end_period=end)
-    df_usd.rename(columns={"NV_USD": name}, inplace=True)
+    df_usd = df_usd.rename(columns={"NV_USD": name})
     dfs_usd.append(df_usd.set_index("Date"))
 
     # df_share = fetch_cofer_data(code, "SHRO_PT", start_period=start, end_period=end)
@@ -101,7 +107,7 @@ for name, code in currencies.items():
     # fetch_imf_data() fetches "OBS_VALUE", not "SHRO_PT".
     # fetch_imf_data() has other cols that will not be used.
     # Select only ['Date',name]
-    df_share.rename(columns={"OBS_VALUE": name}, inplace=True)
+    df_share = df_share.rename(columns={"OBS_VALUE": name})
     df_share = df_share[["Date", name]]
 
     # common lines of commands from here.
@@ -109,8 +115,8 @@ for name, code in currencies.items():
     dfs_share.append(df_share.set_index("Date"))
 
 # 날짜 기준으로 병합
-df_usd_all = pd.concat(dfs_usd, axis=1)
-df_share_all = pd.concat(dfs_share, axis=1)
+df_usd_all = pd.concat(dfs_usd, axis=1).sort_index()
+df_share_all = pd.concat(dfs_share, axis=1).sort_index()
 
 print(df_share_all)
 
@@ -141,7 +147,8 @@ df_with_other.plot.area(
 
 ax[0].set_xlabel("")
 ax[0].ticklabel_format(style="plain", axis="y")
-ax[0].legend(loc="upper left", bbox_to_anchor=(0, 0.85))
+# 선이 없는 아래쪽 USD 영역에 범례를 둔다.
+ax[0].legend(loc="lower center", ncol=3)
 ax[0].text(
     0,
     1.00,

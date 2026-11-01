@@ -1,29 +1,30 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 26] 월별 미국 국채 경매규모
 # # [그림 28] 미국 국채 낙찰기관별 비중
-# 두 개의 그래프를 모두 그림
-# 첫 번째 그림 화면출력 후 그림창을 닫아야 다음 그림이 출력됨
-# ## required file
-#   - plot_def.py
-#   - treasury_auctions_api.py : Treasury Fiscal Data, Treasury Auctions Data에서 data fetch
+#
+# ## 이 코드가 하는 일
+# 미국 재무부 Fiscal Data에서 국채 경매 결과를 받아 그림 두 장을 차례로 그린다.
+# 첫 번째 그림 창을 닫아야 두 번째 그림이 나타난다.
+#
+# ## 그림이 다루는 내용
+# 미국 재무부는 국채를 경매로 판다. 투자자들이 원하는 금리와 금액을 써 내고, 낮은 금리를 써 낸 순서로 낙찰된다.
+# - 그림 26: 만기별 월간 낙찰액. 왼쪽은 단기국채(4·6·8주), 오른쪽은 장기국채(10·20·30년)이다.
+# - 그림 28: 누가 국채를 사 갔는지(낙찰기관별 비중). 단기국채(Bill)와 장기국채(Bond)를 비교한다.
+#   - Direct: 직접 응찰한 투자자, Indirect: 외국 중앙은행 등이 대리인을 통해 응찰한 몫
+#   - Primary Dealer: 경매에 반드시 참여해야 하는 대형 금융회사, SOMA: 연준이 만기가 된 국채를 새 국채로 바꾼 몫
+#
+# ## 결과물
+# pic_jpg/f26_treasury_auctions_1.jpg(그림 26), pic_jpg/f26_treasury_auctions_2.jpg(그림 28), 같은 이름의 tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - treasury_auctions_api.py: 경매 결과를 받아 data/treasury_auctions_2024.csv로 저장(fetch_securities_auction)
+#
+# ## 그리기
+# - 그림 26: 만기별 낙찰액을 쌓은 막대그래프. 막대가 위쪽까지 차서 y축 위쪽을 35% 넓혀 범례 자리를 만든다.
+# - 그림 28: 낙찰기관별 월평균 비중을 쌓은 막대그래프. 막대가 그림을 꽉 채우므로 범례는 그림 아래에 가로로 둔다.
 # %%
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -80,7 +81,7 @@ for col in cols_to_convert:
 
 
 # 날짜 변환 실패(NaT) 행 제거
-df.dropna(subset=["auction_date", "issue_date"], inplace=True)
+df = df.dropna(subset=["auction_date", "issue_date"])
 
 # issue_date 기준으로 2024년 데이터 필터링
 df = df[df["auction_date"].dt.year >= 2023]
@@ -156,6 +157,8 @@ for i in [1, 2]:
                 transform=ax[idx].transAxes,
                 fontsize=12,
             )
+            # 막대 위에 범례 자리를 비운다.
+            ax[idx].set_ylim(top=ax[idx].get_ylim()[1] * 1.35)
             ax[idx].legend(loc="upper left")
 
         ax[0].text(
@@ -263,7 +266,9 @@ for i in [1, 2]:
             fontsize=12,
             transform=ax[0].transAxes,
         )
-        ax[0].legend(loc="upper left", bbox_to_anchor=(0.02, 0.5))
+        # 막대가 그림을 채우므로 범례는 그림 아래에 둔다.
+        handles, labels = ax[0].get_legend_handles_labels()
+        fig.legend(handles, labels, loc="outside lower center", ncol=len(labels))
 
     # 저장 및 출력
     # python py 파일 이름과 동일한 이름으로 그림 파일을 tif, jpg로 저장하는 루틴

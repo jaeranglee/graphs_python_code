@@ -1,30 +1,31 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 48] 달러 인덱스와 10년물 미국채 수익률
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - treasury_buybacks_api.py  : Treasury Fiscal Data, Treasury Buybacks Data Fetch
+#
+# ## 이 코드가 하는 일
+# FRED에서 달러인덱스와 10년만기 국채금리를 받아 한 그림에 그린다(y축 두 개).
+#
+# ## 그림이 다루는 내용
+# 달러인덱스는 여러 나라 통화와 비교한 달러의 평균 가치이다. 오르면 달러가 강해진 것이다.
+# 보통 미국 금리가 오르면 달러 자산의 매력이 커져 달러도 강해진다.
+# 2024~2025년에 둘이 함께 움직였는지, 따로 움직인 때가 있었는지 비교한다.
+#
+# ## 결과물
+# pic_jpg/f48_dollar_index_and_10y.jpg, pic_tif/f48_dollar_index_and_10y.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - fred_api.py: FRED 자료 받기
+#
+# ## 자료 받기 (FRED)
+# - 명목 광의 달러인덱스 (DTWEXBGS): 왼쪽 y축
+# - 10년만기 국채금리 (DGS10): 오른쪽 y축
+# - 두 축의 범례를 하나로 합쳐 선이 없는 오른쪽 위에 둔다.
 # %%
 import pandas as pd
 import matplotlib.pyplot as plt
 
 # 폰트 설정
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -125,8 +126,10 @@ ax2.text(
     horizontalalignment="left",
     color="black",
 )
-ax1.legend(loc="upper left", bbox_to_anchor=(0.25, 1))
-ax2.legend(loc="upper left", bbox_to_anchor=(0.25, 0.93))
+# 두 축의 범례를 하나로 합친다.
+h1, l1 = ax1.get_legend_handles_labels()
+h2, l2 = ax2.get_legend_handles_labels()
+ax1.legend(h1 + h2, l1 + l2, loc="upper right")
 
 
 # 저장 및 출력

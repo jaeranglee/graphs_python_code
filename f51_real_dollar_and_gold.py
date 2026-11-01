@@ -1,31 +1,27 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 51] 실질 달러인덱스, 금 현물가격, 실질실효 유로인덱스
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - fred_api.py       : FRED, api key required
-#   - bok_ecos_api.py   : Bank of Korea, ECOS Data, api key required
+#
+# ## 이 코드가 하는 일
+# FRED에서 달러인덱스와 유로 환율지수를, 한국은행 ECOS에서 금 가격을 받아 그림 두 개를 나란히 그린다.
+#
+# ## 그림이 다루는 내용
+# - 왼쪽: 명목 달러인덱스와 실질 달러인덱스. 실질은 나라별 물가 차이를 반영해 달러의 실제 구매력을 비교한 것이다.
+# - 오른쪽: 금 가격과 유로의 실질실효환율. 달러가 약해지는 시기에 금과 유로의 가치가 어떻게 움직였는지 본다.
+# 2000년부터 그린다.
+#
+# ## 결과물
+# pic_jpg/f51_real_dollar_and_gold.jpg, pic_tif/f51_real_dollar_and_gold.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - fred_api.py: FRED 자료 받기(FRED API key 필요)
+# - bok_ecos_api.py: 한국은행 ECOS 자료 받기(ECOS API key 필요, defs/.env의 ECOS_API_KEY)
 # %%
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 # 한글 폰트 설정
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -49,10 +45,10 @@ end = "2025-12-31"
 from fred_api import fetch_fred_series
 
 # %% [markdown]
-# ## FRED 자료 추출
-# - Nominal Broad U.S. Dollar Index (DTWEXBGS)
-# - Real Broad Dollar Index (RTWEXBGS)
-# - Real Broad Effective Exchange Rate for Euro Area (RBXMBIS)
+# ## 자료 받기 (FRED)
+# - 명목 광의 달러인덱스 (DTWEXBGS)
+# - 실질 광의 달러인덱스 (RTWEXBGS)
+# - 유로 지역 실질실효환율 (RBXMBIS)
 # %%
 dbxy_df = fetch_fred_series("DTWEXBGS", start_date=start, end_date=end)
 
@@ -61,8 +57,11 @@ df0 = fetch_fred_series("RTWEXBGS", start_date=start, end_date=end)
 df2 = fetch_fred_series("RBXMBIS", start_date=start, end_date=end)
 
 # %% [markdown]
-# ## ECOS 자료 추출
-# - ["Gold", "902Y003", "040101", "M"]  # Gold Spot Price
+# ## 자료 받기 (한국은행 ECOS)
+# - 금 현물가격, 월별: 통계표 코드 902Y003, 항목 코드 040101
+# - fetch_ecos_series(이름, 통계표 코드, 항목코드1, 항목코드2, 항목코드3, 주기, start_date, end_date) 순서로 넣는다.
+#   이 통계는 항목코드가 하나뿐이라 항목코드2, 3 자리에 빈 문자열 ""을 넣는다. 주기 "M"은 월별이다.
+# - ECOS 홈페이지에서 통계를 검색하면 통계표 코드와 항목 코드를 확인할 수 있다.
 # %%
 from bok_ecos_api import fetch_ecos_series
 
@@ -73,7 +72,7 @@ dfs = {}
 
 for name, stat_code, item_code, cycle in series_list:
     dfs[name] = fetch_ecos_series(
-        name, stat_code, item_code, cycle, start_date=start, end_date=end
+        name, stat_code, item_code, "", "", cycle, start_date=start, end_date=end
     )
 
 
@@ -88,8 +87,8 @@ for name, df in dfs.items():
     print(f"{name}: {dup_count} duplicates")
 
 # %% [markdown]
-# ## IMF 자료 추출
-# - Gold Price from IMF Data (optional)
+# ## (참고) IMF에서 금 가격 받기
+# 금 가격은 IMF 자료로도 받을 수 있다. 아래 코드를 ECOS 대신 쓰면 된다(이 파일에서는 실행하지 않는다).
 # ```python
 # from imf_api import fetch_imf_data
 #
@@ -155,8 +154,10 @@ ax_right.plot(
     color="black",
 )
 
-ax_left.legend(loc="upper left", bbox_to_anchor=(0.4, 1.0))
-ax_right.legend(loc="upper left", bbox_to_anchor=(0.4, 0.93))
+# 두 축의 범례를 하나로 합친다.
+h1, l1 = ax_left.get_legend_handles_labels()
+h2, l2 = ax_right.get_legend_handles_labels()
+ax_left.legend(h1 + h2, l1 + l2, loc="lower right")
 
 # 단위 표시
 ax_left.text(

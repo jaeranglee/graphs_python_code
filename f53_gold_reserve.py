@@ -1,8 +1,23 @@
 # %% [markdown]
 # # [그림 53] 전세계 금 보유량, 국가별 보유량
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - imf_api.py        : IMF Data, no api key required
+#
+# ## 이 코드가 하는 일
+# IMF에서 세계와 주요국 중앙은행의 금 보유량, 외환보유액을 받아 그림 두 개를 나란히 그린다.
+#
+# ## 그림이 다루는 내용
+# 중앙은행은 외환보유액의 일부를 금으로 가지고 있다. 최근 몇 년 동안 여러 나라 중앙은행이 금을 많이 사들였다.
+# - 왼쪽: 세계 중앙은행의 금 보유량(왼쪽 y축)과 외환보유액 중 금이 차지하는 비중(오른쪽 y축)
+# - 오른쪽: 금을 가장 많이 가진 나라 중 하나인 독일(왼쪽 y축)과 중국·인도·일본·터키(오른쪽 y축)의 금 보유량
+#
+# ## 결과물
+# pic_jpg/f53_gold_reserve.jpg, pic_tif/f53_gold_reserve.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - imf_api.py: IMF 자료 받기(fetch_gold_data, fetch_imf_data, API key 필요 없음)
+#
+# ## 자료 가공
+# - 금 보유 비중(%) = 세계 금 보유액(달러) / 세계 외환보유액 x 100
 # %%
 import matplotlib.dates as mdates
 
@@ -11,7 +26,7 @@ import matplotlib.pyplot as plt
 
 # 한글 폰트 설정
 # Set font depending on the platform
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -117,7 +132,7 @@ for country in countries:
         end_period=end,
     )
 
-    df.rename(columns={df.columns[-1]: "value"}, inplace=True)
+    df = df.rename(columns={df.columns[-1]: "value"})
     all_data[country] = df.set_index("Date")["value"].to_dict()
 df_pivot = pd.DataFrame(all_data)
 

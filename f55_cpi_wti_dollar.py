@@ -1,8 +1,26 @@
 # %% [markdown]
 # # [그림 55] 트럼프 대통령 재임기간 소비자물가, WTI, 달러인덱스 상승률
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - fred_api.py       : FRED, api key required
+#
+# ## 이 코드가 하는 일
+# FRED에서 물가, 유가, 달러인덱스를 받아 상승률을 계산하고 그림 두 개를 나란히 그린다.
+#
+# ## 그림이 다루는 내용
+# 트럼프 대통령의 첫 임기(2017~2021년)와 두 번째 임기(2025년~)에 물가, 국제유가, 달러 가치가 어떻게 움직였는지 비교한다.
+# 관세는 수입품 가격을 올려 물가를 밀어 올릴 수 있지만, 유가가 내리거나 달러가 강해지면 그 효과가 줄어든다.
+# - 왼쪽: 소비자물가와 근원물가의 전년동월대비 상승률
+# - 오른쪽: WTI 유가(왼쪽 y축)와 달러인덱스(오른쪽 y축)의 전년동월대비 상승률
+# - 음영은 트럼프 대통령 재임기간이다. 2016년 이후를 그린다.
+#
+# ## 결과물
+# pic_jpg/f55_cpi_wti_dollar.jpg, pic_tif/f55_cpi_wti_dollar.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - fred_api.py: FRED 자료 받기(FRED API key 필요)
+#
+# ## 자료 받기 (FRED)
+# - 소비자물가 CPIAUCNS, 근원물가 CPILFENS, WTI 유가 MCOILWTICO, 명목 광의 달러인덱스 DTWEXBGS: pct_change(12)로 전년동월대비 상승률
+# - BOPTIMP, IMP0004, BUSINV, 계절조정 CPI(CPIAUCSL, CPILFESL)도 불러오지만 그림에는 쓰지 않는다.
 # %%
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -10,7 +28,7 @@ import matplotlib.dates as mdates
 
 
 # 한글 폰트 설정
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -57,7 +75,7 @@ df_wti = fetch_fred_series("MCOILWTICO", start_date=start, end_date=end)
 
 
 # Set it as index
-bdxy_df.set_index("observation_date", inplace=True)
+bdxy_df = bdxy_df.set_index("observation_date")
 
 # resample daily dollar index to monthly average
 bdxy_df = bdxy_df.resample("ME").mean().copy()

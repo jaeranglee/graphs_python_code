@@ -1,31 +1,30 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 40] 연준의 RP 거래
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - fred_api.py
-#   - nyfed_api_rp.py: NY Fed Markets Data, no api key required
+#
+# ## 이 코드가 하는 일
+# 뉴욕 연준에서 연준의 RP(레포) 운영 결과를 받아, 날짜별 대출액을 그린다.
+#
+# ## 그림이 다루는 내용
+# RP는 연준이 금융회사로부터 국채를 담보로 받고 하루 동안 돈을 빌려주는 거래이다(RRP와 방향이 반대).
+# 시장에서 돈이 모자라 레포 금리가 오르면 금융회사들이 연준의 RP를 이용한다.
+# 분기 말처럼 자금 수요가 몰리는 날에 이용액이 크게 늘어나는 모습을 본다.
+#
+# ## 결과물
+# pic_jpg/f40_rp_vol.jpg, pic_tif/f40_rp_vol.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - nyfed_api_rp.py: 뉴욕 연준 RP 운영 결과 받기(fetch_rp_operation, API key 필요 없음)
+# - fred_api.py: FRED의 RPONTTLD로 같은 그림을 그리는 코드를 문자열로 막아 두었다. 결과는 같다.
+#
+# ## 그리기
+# - Type이 Repo인 거래만 골라 하루 낙찰액(Accepted)을 더하고, 10억 달러 단위로 그린다.
 # %%
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 # Set font depending on the platform
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -89,7 +88,7 @@ df["Accepted"] = pd.to_numeric(df["Accepted"], errors="coerce") / 1e9
 df["Limit"] = pd.to_numeric(df["Limit"], errors="coerce") / 1e9
 
 # 날짜 변환 실패(NaT) 행 제거
-df.dropna(subset=["Date"], inplace=True)
+df = df.dropna(subset=["Date"])
 
 
 # 필요한 증권 종류만 필터링

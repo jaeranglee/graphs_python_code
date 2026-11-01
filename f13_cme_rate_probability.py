@@ -1,17 +1,30 @@
 # %% [markdown]
 # # [그림 13] 정책금리 기대확률(2025년 9월 17일 FOMC)
-# 이용되는 data는 CME Fed Watch 사이트에서 csv 파일로 다운로드한 것이다.
-# CME는 무료로 공개된 Open API는 없다. Fed Watch 사이트에 가면 일부 자료를 화면으로 보여주거나
-# csv 파일로 공개한다.
+#
+# ## 이 코드가 하는 일
+# CME FedWatch에서 내려받은 csv 파일(data/FedMeeting_20250917.csv)을 읽어,
+# 2025년 9월 17일 FOMC 회의에서 정책금리가 어떻게 정해질지에 대한 시장의 예상 확률을 날짜별로 그린다.
+#
+# ## 그림이 다루는 내용
+# FOMC는 미국 정책금리를 정하는 연준의 회의이다. CME FedWatch는 연방기금금리 선물 가격으로부터
+# "다음 회의에서 금리를 얼마나 바꿀지"에 대한 확률을 계산해 보여준다.
+# 50bp 인하(3.75~4.00%), 25bp 인하(4.00~4.25%), 동결(4.25~4.50%) 확률이 회의 날짜가 다가오며 어떻게 변했는지 본다.
+# (1bp = 0.01%포인트)
+#
+# ## 자료를 얻는 방법
+# CME는 무료 Open API를 제공하지 않는다. 아래 FedWatch 사이트의 historical 자료를 csv로 내려받아 data 폴더에 넣었다.
 # https://www.cmegroup.com/ko/markets/interest-rates/cme-fedwatch-tool.html
-# 이중에 historical 쪽 자료를 받은 것이다.
-# ## required file
-#   - plot_def.py
+#
+# ## 결과물
+# pic_jpg/f13_cme_rate_probability.jpg, pic_tif/f13_cme_rate_probability.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
 # %%
 import matplotlib.dates as mdates
 
 # 한글 폰트 설정
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 

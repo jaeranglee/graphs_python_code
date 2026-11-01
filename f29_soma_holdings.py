@@ -1,28 +1,24 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 29] 연준의 국채보유액과 연방정부의 연준예금(TGA)잔액
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - fred_api.py
+#
+# ## 이 코드가 하는 일
+# FRED에서 연준의 국채 보유액과 재무부의 연준 예금(TGA) 잔액을 받아 그림 두 개를 나란히 그린다.
+#
+# ## 그림이 다루는 내용
+# - 왼쪽: 연준은 코로나 때 국채를 대량으로 사들였고(양적완화), 2022년부터는 만기가 된 국채를 다시 사지 않는 방식으로
+#   보유액을 줄였다(양적긴축). 중장기국채(Notes and Bonds)와 단기국채(Bills)로 나눠 본다.
+# - 오른쪽: TGA는 미국 재무부가 연준에 둔 예금 계좌이다. 세금이 들어오고 국채를 발행하면 늘고, 돈을 쓰면 준다.
+#
+# ## 결과물
+# pic_jpg/f29_soma_holdings.jpg, pic_tif/f29_soma_holdings.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - fred_api.py: FRED 자료 받기
 # %%
 import matplotlib.dates as mdates
 
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -40,23 +36,14 @@ from plot_def import *
 set_fonts()
 
 # %% [markdown]
-# ## Fetch data from FRED
-#   - Assets: Securities Held Outright:
-#       - U.S. Treasury Securities: Notes and Bonds, Nominal: Wednesday Level (WSHONBNL)
-#       - in Millions USD
-#   - Assets: Securities Held Outright:
-#       - U.S. Treasury Securities: Bills: Wednesday Level (WSHOBL)
-#       - in Millions USD
-#   - Assets: Securities Held Outright:
-#       - U.S. Treasury Securities: Notes and Bonds, Inflation-Indexed: Wednesday Level (WSHONBIIL)
-#       - in Million USD
-#   - Assets: Securities Held Outright:
-#       - U.S. Treasury Securities: Wednesday Level (WSHOTSL)
-#       - in Million USD
-#   - Liabilities and Capital: Liabilities:
-#       - Deposits with F.R. Banks, Other Than Reserve Balances:
-#       - U.S. Treasury, General Account: Wednesday Level (WDTGAL)
-#       - in Million USD
+# ## 자료 받기 (FRED, 모두 매주 수요일 기준, 백만 달러)
+# - 연준 보유 중장기국채 (WSHONBNL)
+# - 연준 보유 단기국채 (WSHOBL)
+# - 연준 보유 물가연동국채 (WSHONBIIL): 불러오지만 그림에는 쓰지 않는다(TIPS 선은 주석 처리).
+# - 연준 보유 국채 합계 (WSHOTSL): 불러오지만 그림에는 쓰지 않는다.
+# - 재무부 일반계정 TGA (WDTGAL)
+# ## 그리기
+# - 모두 1e6으로 나눠 조 달러로 그린다. 왼쪽은 중장기국채와 단기국채, 오른쪽은 TGA이다.
 # %%
 start = "2020-01-01"
 end = "2025-12-31"
@@ -78,7 +65,7 @@ all_data = {}
 for term, sid in series_ids.items():
     df = fetch_fred_series(sid, start_date=start, end_date=end)
 
-    df.rename(columns={df.columns[-1]: "value"}, inplace=True)
+    df = df.rename(columns={df.columns[-1]: "value"})
     all_data[term] = df.set_index("observation_date")["value"].to_dict()
 
 

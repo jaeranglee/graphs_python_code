@@ -1,34 +1,39 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 37] 은행 지급준비금과 1일물 금리(2024년 이후)
 # # [그림 38] 은행 지급준비금과 1일물 금리(2023년)
 # # [그림 39] IORB와 TGCR, SOFR 차이
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - fred_api.py
-#   - nyfed_api_all_rates.py
+#
+# ## 이 코드가 하는 일
+# FRED와 뉴욕 연준에서 지급준비금과 하루짜리 금리들을 받아, 기간을 바꿔 가며 그림 세 장을 그린다.
+#
+# ## 그림이 다루는 내용
+# 지급준비금은 은행이 연준에 맡겨 둔 돈이다. 지급준비금이 넉넉하면 은행끼리 돈을 빌릴 필요가 적어
+# 시장 금리가 IORB(연준이 지급준비금에 주는 이자)보다 낮게 머문다.
+# 연준이 양적긴축으로 돈을 거둬들여 지급준비금이 줄면 레포 금리(TGCR, SOFR)가 IORB 가까이, 또는 그 위로 올라간다.
+# - 그림 38(2023년)과 그림 37(2024년 이후): 왼쪽은 지급준비금, 오른쪽은 IORB·SOFR·TGCR과 정책금리 범위
+# - 그림 39: 2021년 9월 이후 TGCR과 SOFR에서 IORB를 뺀 값. 0(점선)보다 위로 올라가면 돈이 귀해졌다는 신호이다.
+#
+# ## 결과물
+# pic_jpg/f37_bank_reserves_sofr_iorb_1.jpg(그림 38), _2.jpg(그림 37), _3.jpg(그림 39), 같은 이름의 tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - fred_api.py: FRED 자료 받기
+# - nyfed_api_all_rates.py: 뉴욕 연준 TGCR 금리 받기(fetch_all_secured_rates)
+#
+# ## 자료 받기 (FRED)
+# - 지급준비금 (WRESBAL), IORB (2021년 7월 이전에는 이름이 IOER이라 이어 붙인다), SOFR,
+#   실효연방기금금리 (RIFSPFFNB), 정책금리 범위 (DFEDTARU, DFEDTARL)
+# ## 그리기
+# - filter_dataframes(시작일, 종료일): 모든 자료를 같은 기간으로 잘라 주는 함수
+# - for 반복문으로 i = 1, 2, 3일 때 기간을 바꿔 그림 세 장을 그린다.
 # %%
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 # setting Korean fonts
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 

@@ -1,35 +1,31 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 6] MMF와 은행예금 잔액
 # # [그림 7] MMF와 은행예금 이자율
-# ## required file
-#   - fred_api.py
-#   - plot_def.py
-# ## required packages
-# ```python
-# pip install datetime
-# ```
+#
+# ## 이 코드가 하는 일
+# FRED에서 예금·MMF 잔액과 이자율을 받아 그림 두 개를 나란히 그린다.
+#
+# ## 그림이 다루는 내용
+# MMF(Money Market Fund, 머니마켓펀드)는 단기국채 같은 안전한 단기자산에 투자하는 펀드이다.
+# MMF 수익률은 정책금리를 빠르게 따라가지만 은행 저축예금 금리는 천천히 오른다.
+# 2022년부터 금리가 오르자 돈이 은행 예금에서 MMF로 옮겨갔다.
+# - 왼쪽(그림 6): 은행 예금은 줄거나 정체되고 MMF 자산은 늘어나는 모습
+# - 오른쪽(그림 7): MMF 이자율과 저축예금 이자율의 차이
+#
+# ## 결과물
+# pic_jpg/f6_mmf.jpg, pic_tif/f6_mmf.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - fred_api.py: FRED 자료 받기(fetch_fred_series)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# ## 필요한 패키지
+# - 따로 설치할 패키지는 없다(datetime은 파이썬에 기본으로 들어 있다).
 # %%
 
 import matplotlib.dates as mdates
 
 # 폰트 설정
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -55,16 +51,18 @@ end = date.today()
 from fred_api import fetch_fred_series
 
 # %% [markdown]
-# ## Fetch data from FRED
-#   - Deposits, All Commercial Banks (DPSACBM027NBOG)
-#   - Money Market Funds; Total Financial Assets, Level (MMMFFAQ027S)
-#       - Units: Millions of Dollars,Not Seasonally Adjusted
-#       - Frequency:Quarterly
-#   - Overnight Reverse Repurchase Agreements: Treasury Securities Sold by the Federal Reserve in the Temporary
-# Open Market Operations (RRPONTSYD)
-#   - National Rate: Savings (SNDR)
-#   - Treasury Yield: Money Market <100M (MMTY)
-#   - National Rate: Money Market <100M (MMNDR)
+# ## 자료 받기 (FRED)
+# - 전체 상업은행 예금 (DPSACBM027NBOG): 10억 달러 단위, 1e3으로 나눠 조 달러로 그린다.
+# - MMF 총금융자산 (MMMFFAQ027S): 분기 자료, 백만 달러 단위, 1e6으로 나눠 조 달러로 그린다.
+# - 연준 역레포(RRP) 잔액 (RRPONTSYD): 불러오기만 하고 그림에는 쓰지 않는다.
+# - 저축예금 전국 평균 금리 (SNDR)
+# - 국채형 MMF 수익률 (MMTY)
+# - MMF 전국 평균 금리 (MMNDR)
+#
+# ## 그리기
+# - 왼쪽: 은행 예금(왼쪽 y축)과 MMF 자산(오른쪽 y축). 두 축의 범례를 하나로 합쳐 왼쪽 위에 둔다.
+#   2023년 1~6월을 회색으로 칠한다.
+# - 오른쪽: 이자율 세 개. 범례는 선이 없는 오른쪽 가운데에 둔다.
 # %%
 df0 = fetch_fred_series("DPSACBM027NBOG", start_date=start, end_date=end)
 
@@ -104,8 +102,10 @@ ax[0].xaxis.set_major_locator(mdates.YearLocator())
 ax[0].xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
 
 # 라벨 위치 설정
-ax_left.legend(loc="upper left", bbox_to_anchor=(0.35, 1.0))
-ax_right.legend(loc="upper left", bbox_to_anchor=(0.35, 0.925))
+# 두 축의 범례를 하나로 합친다.
+h1, l1 = ax_left.get_legend_handles_labels()
+h2, l2 = ax_right.get_legend_handles_labels()
+ax_left.legend(h1 + h2, l1 + l2, loc="upper left")
 ax_left.yaxis.label.set_visible(True)
 
 # 단위 표시
@@ -163,7 +163,7 @@ ax[1].plot(
 )
 
 # 라벨표시 위치
-ax[1].legend(loc="upper left", bbox_to_anchor=(0.45, 0.7))
+ax[1].legend(loc="center right")
 
 # X축 연도 표시 간격과 표시 형식
 ax[1].xaxis.set_major_locator(mdates.YearLocator())

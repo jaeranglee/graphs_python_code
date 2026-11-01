@@ -1,29 +1,24 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 30] 미국 연방정부 국채 잔액
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - treasury_api.py : Treasury Fiscal Data에서 받아놓은 json file을 parsing 하는 파일
-# ## data 디렉토리에 필요한 파일
-#   - Treasury Fiscal Data에서 받아놓은 json file
-#       - data/MSPD_SumSecty_20010131_20250731.json
-#   - 각자 직접 홈페이지에서 다운로드하기를 추천
-#   - api fetch 시간이 너무 오래 걸림
+#
+# ## 이 코드가 하는 일
+# 재무부 Fiscal Data에서 미리 내려받은 json 파일을 읽어, 국채 종류별 잔액을 그린다.
+#
+# ## 그림이 다루는 내용
+# 미국 국채는 만기에 따라 단기국채(Bills, 1년 이하), 중기국채(Notes, 2~10년), 장기국채(Bonds, 20~30년)로 나뉘고,
+# 물가연동국채(TIPS) 등도 있다. 정부 부채가 늘면서 종류별 잔액이 어떻게 늘었는지 본다.
+#
+# ## 결과물
+# pic_jpg/f30_treasury_outstanding.jpg, pic_tif/f30_treasury_outstanding.tif
+#
+# ## 필요한 파일
+# - plot_def.py (defs): 한글 폰트 설정, 그림 저장
+# - treasury_api.py (defs): 내려받은 json 파일을 읽는 함수(fetch_debt_outstanding_json)
+# - data/MSPD_SumSecty_20010131_20250731.json: 재무부 월간 국채 현황(Monthly Statement of the Public Debt)
+#
+# ## 참고
+# API로 바로 받으면 시간이 너무 오래 걸려서, 홈페이지에서 json 파일을 내려받아 쓰는 방법을 권한다.
+# 최신 자료가 필요하면 새로 내려받아 파일 이름을 바꿔 넣는다.
 # %%
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -31,7 +26,7 @@ import matplotlib.dates as mdates
 
 
 # Set font depending on the platform
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 

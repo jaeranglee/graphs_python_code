@@ -1,33 +1,32 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 16] 직전 2개월 NFP 수정치
-# ## required file
-#   - plot_def.py
-#   - fred_api.py
-#   - nfp_revision.py : NPF 수정 데이터를 불러와서 csv 파일로 저장
-#   - "data/nfp_revisions.csv": 위 코드로 불러온 데이터
+#
+# ## 이 코드가 하는 일
+# data/nfp_revisions.csv를 읽어, NFP 발표일마다 직전 두 달 치가 얼마나 수정됐는지 막대그래프로 그린다.
+#
+# ## 그림이 다루는 내용
+# NFP를 발표할 때는 이번 달 숫자와 함께 지난 두 달의 숫자도 고쳐 발표한다.
+# 두 달 치 수정 폭을 더하면 그동안 고용을 얼마나 많게(또는 적게) 발표했는지 알 수 있다.
+# 2007년 이후 수정치를 보여주고, 크게 하향 수정된 2023년 11월 3일과 2025년 8월 1일 발표를 따로 강조한다.
+#
+# ## 결과물
+# pic_jpg/f16_nfp_2month_revisions.jpg, pic_tif/f16_nfp_2month_revisions.tif
+#
+# ## 필요한 파일
+# - plot_def.py (defs): 한글 폰트 설정, 그림 저장
+# - nfp_revision.py (이 폴더): NFP 발표 시점별 값을 받아 수정 내역을 csv로 저장하는 코드
+# - data/nfp_revisions.csv: 위 코드가 만든 파일
+#
+# ## 그리기
+# - 막대 높이 = 1개월 전 수정치(revision1) + 2개월 전 수정치(revision2)
+# - 위로 고쳐지면 파란색, 아래로 고쳐지면 검은색
 # %%
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sqlalchemy.dialects.mssql.information_schema import columns
 
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 

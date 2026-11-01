@@ -1,12 +1,25 @@
 # %% [markdown]
 # # [그림 14] 월별 구인건수와 고용 증감
-# ## required file
-#   - plot_def.py
-#   - fred_api.py
+#
+# ## 이 코드가 하는 일
+# FRED에서 고용 관련 자료 세 개를 받아 막대그래프 세 개를 나란히 그린다.
+#
+# ## 그림이 다루는 내용
+# - 구인건수(JOLTS): 기업이 사람을 뽑으려고 낸 일자리 수. 노동 수요를 보여준다.
+# - ADP 고용: 민간 급여처리 회사 ADP가 집계한 민간 일자리 증감. 정부 발표보다 이틀 먼저 나온다.
+# - NFP(비농업 고용): 미국 노동부가 매달 발표하는 일자리 증감. 시장이 가장 주목하는 고용 지표이다.
+# 책 본문에서 다룬 달(구인건수 2023년 8월, ADP·NFP 2023년 9월)을 다른 색으로 강조한다.
+#
+# ## 결과물
+# pic_jpg/f14_nfp_adp.jpg, pic_tif/f14_nfp_adp.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - fred_api.py: FRED 자료 받기
 # %%
 import pandas as pd
 
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -25,12 +38,19 @@ start = "2022-07-01"
 end = "2025-10-01"
 
 # %% [markdown]
-# ## Fetch data from FRED
-#   - Total Nonfarm Private Payroll Employment (ADPWNUSNERSA), person, sa, weekly
-#   - All Employees, Total Nonfarm (PAYEMS), thousand person, sa, monthly
-#   - Job Openings: Total Nonfarm (JTSJOL)
-#   - Initial Claims (ICSA), number, sa
-#   - Continued Claims (Insured Unemployment) (CCSA), number, sa
+# ## 자료 받기 (FRED)
+# - NFP: 비농업 전체 고용자 수 (PAYEMS), 천 명, 계절조정, 월별
+# - ADP: 민간 비농업 고용자 수 (ADPMNUSNERSA), 명, 계절조정, 월별. 1000으로 나눠 천 명 단위로 맞춘다.
+# - 구인건수 (JTSJOL), 천 건
+#
+# ## 자료 가공
+# 1. 세 자료를 반복문(for)으로 차례로 받아 월별 평균으로 맞추고 날짜를 매달 1일로 통일한다.
+# 2. 하나의 dataframe(df_all)으로 합친다.
+# 3. NFP와 ADP는 고용자 '수'이므로 diff()로 전월 대비 증감을 구한다.
+#
+# ## 그리기
+# 왼쪽부터 구인건수, ADP 증감, NFP 증감을 막대로 그린다.
+# 구인건수는 2023년 8월을 파란색으로, ADP와 NFP는 2023년 9월을 속이 빈 막대로 강조한다.
 # %%
 
 
@@ -42,7 +62,7 @@ series_ids = {"NFP": "PAYEMS", "ADP": "ADPMNUSNERSA", "Job Openings": "JTSJOL"}
 all_data = {}
 for term, sid in series_ids.items():
     df_temp = fetch_fred_series(sid, start_date=start, end_date=end)
-    df_temp.rename(columns={df_temp.columns[-1]: "value"}, inplace=True)
+    df_temp = df_temp.rename(columns={df_temp.columns[-1]: "value"})
 
     # Series로 변환
     s = df_temp.set_index("observation_date")["value"]

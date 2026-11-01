@@ -1,31 +1,26 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 35] 연준의 총자산 규모
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - fred_api.py
+#
+# ## 이 코드가 하는 일
+# FRED에서 연준의 총자산과 국채·MBS 보유액을 받아, 세 부분으로 나눠 쌓은 면적 그래프를 그린다.
+#
+# ## 그림이 다루는 내용
+# 연준은 국채와 MBS(주택담보대출을 묶어 만든 채권)를 사서 시중에 돈을 푼다(양적완화).
+# 코로나 때 총자산이 4조 달러대에서 9조 달러 가까이 늘었고, 2022년부터는 보유 채권을 줄이고 있다(양적긴축).
+#
+# ## 결과물
+# pic_jpg/f35_fedasset.jpg, pic_tif/f35_fedasset.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장, FRED 자료 받기(fetch_fred_series)
+# - fred_api.py: fetch_fred_series가 실제로 들어 있는 파일(plot_def.py가 대신 불러온다)
 # %%
 import matplotlib.ticker as ticker
 
 # import matplotlib.dates as mdates
 
 # Set font depending on the platform
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -48,8 +43,12 @@ start = "2018-01-01"
 end = "2025-12-31"
 
 # %% [markdown]
-# ## FRED 자료 추출
-# - RESPPANWW, WSHOTSL, WSHOMCB
+# ## 자료 받기 (FRED, 매주 수요일 기준, 백만 달러)
+# - 연준 총자산 (RESPPANWW), 국채 보유액 (WSHOTSL), MBS 보유액 (WSHOMCB)
+# ## 자료 가공
+# - 모두 1e6으로 나눠 조 달러로 바꾼다.
+# - 기타 = 총자산 - (국채 + MBS)
+# - 국채, MBS, 기타를 차례로 쌓아 면적 그래프로 그린다. 맨 위 경계가 총자산이 된다.
 # %%
 df0 = fetch_fred_series("RESPPANWW", start_date=start, end_date=end)
 df1 = fetch_fred_series("WSHOTSL", start_date=start, end_date=end)
@@ -82,7 +81,7 @@ label_map = {
 
 df_all = df_filtered[label_map.keys()].copy()
 
-df_all.rename(columns=label_map, inplace=True)
+df_all = df_all.rename(columns=label_map)
 
 # 날짜를 datetime으로 변환하고 인덱스로 설정
 df_filtered["observation_date"] = pd.to_datetime(df_filtered["observation_date"])

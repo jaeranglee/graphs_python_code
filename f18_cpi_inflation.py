@@ -1,15 +1,35 @@
 # %% [markdown]
 # # [그림 18] 소비자물가와 근원물가
-# ## required file
-#   - plot_def.py
-#   - fred_api.py
+#
+# ## 이 코드가 하는 일
+# FRED에서 소비자물가지수(CPI)와 근원물가지수를 받아 상승률을 계산하고 그림 두 개를 나란히 그린다.
+#
+# ## 그림이 다루는 내용
+# - 소비자물가(CPI): 가계가 사는 상품과 서비스의 가격 수준
+# - 근원물가: CPI에서 가격이 크게 출렁이는 식료품과 에너지를 뺀 것. 물가의 기조적인 흐름을 보여준다.
+# - 왼쪽: 1년 전 같은 달과 비교한 상승률(전년동월대비). 흔히 말하는 '물가상승률'이다.
+# - 오른쪽: 바로 전 달과 비교한 상승률(전월대비). 최근 흐름을 빨리 보여준다.
+# 2021년 이후를 그리고, 책 본문에서 다룬 2024년 8월 값을 점으로 강조한다.
+#
+# ## 결과물
+# pic_jpg/f18_cpi_inflation.jpg, pic_tif/f18_cpi_inflation.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - fred_api.py: FRED 자료 받기
+#
+# ## 자료 받기 (FRED)
+# - 전년동월대비용(계절조정 전): 소비자물가 CPIAUCNS, 근원물가 CPILFENS. pct_change(12)로 12개월 전 대비 상승률을 구한다.
+# - 전월대비용(계절조정): 소비자물가 CPIAUCSL, 근원물가 CPILFESL. pct_change()로 1개월 전 대비 상승률을 구한다.
+#   전월대비는 계절에 따른 움직임(예: 연초 가격 인상)을 걸러 낸 계절조정 자료를 써야 비교가 정확하다.
+# - WTI 유가(WTISPLC)도 불러오지만 그림에는 쓰지 않는다.
 # %%
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 # 한글 폰트 설정
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 

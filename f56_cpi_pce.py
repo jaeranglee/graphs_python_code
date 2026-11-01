@@ -1,30 +1,32 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 56] 소비자물가지수와 PCE물가지수 상승률
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - fred_api.py
+#
+# ## 이 코드가 하는 일
+# FRED에서 소비자물가지수(CPI)와 PCE물가지수를 받아 상승률을 계산하고 그림 두 개를 나란히 그린다.
+#
+# ## 그림이 다루는 내용
+# PCE물가지수는 개인소비지출(Personal Consumption Expenditures)의 가격 수준으로, 연준이 물가 목표(2%)를 정할 때 쓰는 지표이다.
+# CPI보다 다루는 범위가 넓고 주거비 비중이 작아서 보통 CPI보다 상승률이 조금 낮다.
+# - 왼쪽: CPI와 PCE물가의 전년동월대비 상승률
+# - 오른쪽: 식료품과 에너지를 뺀 근원CPI와 근원PCE의 전년동월대비 상승률
+# - 2000년 이후를 그리고 2000년과 2025년을 회색으로 칠한다.
+#
+# ## 결과물
+# pic_jpg/f56_cpi_pce.jpg, pic_tif/f56_cpi_pce.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - fred_api.py: FRED 자료 받기
+#
+# ## 자료 받기 (FRED)
+# - CPIAUCNS(CPI), CPILFENS(근원CPI), PCEPI(PCE), PCEPILFE(근원PCE): pct_change(12)로 전년동월대비 상승률
+# - 계절조정 CPI(CPIAUCSL, CPILFESL)도 불러오지만 그림에는 쓰지 않는다.
 # %%
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import pandas as pd
 
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 

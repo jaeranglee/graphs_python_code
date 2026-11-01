@@ -1,26 +1,23 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
-# # [그림4] NYCB 주가와 은행업주가
-# # [그림5] 2년물 국채금리
-# ## required file
-#   - fred_api.py
-#   - plot_def.py
-# ## required packages
+# # [그림 4] NYCB 주가와 은행업주가
+# # [그림 5] 2년물 국채금리
+#
+# ## 이 코드가 하는 일
+# Yahoo Finance에서 주가 두 개를, FRED에서 2년만기 국채금리를 받아 그림 두 개를 나란히 그린다.
+#
+# ## 그림이 다루는 내용
+# - 왼쪽(그림 4): 뉴욕커뮤니티뱅크(NYCB)는 2024년 1월 말 CRE 대출 손실에 대비해 충당금을 크게 쌓는다고 발표했고,
+#   주가가 급락했다. 은행주 전체(S&P Banks ETF)와 비교하면 이 은행만 크게 떨어졌음을 알 수 있다.
+#   NYCB는 2024년 Flagstar Financial로 이름을 바꿔 지금은 종목기호 FLG로 거래된다.
+# - 오른쪽(그림 5): 2년만기 국채금리는 앞으로 1~2년 동안의 정책금리 예상을 반영한다.
+#
+# ## 결과물
+# pic_jpg/f4_nycb.jpg, pic_tif/f4_nycb.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - fred_api.py: FRED 자료 받기(fetch_fred_series)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# ## 필요한 패키지
 # ```python
 # pip install yfinance
 # ```
@@ -32,7 +29,7 @@ import yfinance as yf
 
 ##폰트 설정
 
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -55,10 +52,16 @@ start = "2022-01-01"
 end = "2025-10-01"
 
 # %% [markdown]
-# ## Fetch data from FRED
-#   - Market Yield on U.S. Treasury Securities at 2-Year Constant Maturity, Quoted on an Investment Basis (DGS2)
-# ## Fetch from Yahoo Finance, Bank Stock Prices
-#   - bkx = yf.Ticker("^BKX") # KBW Nasdaq Bank Index (optional)
+# ## 자료 받기
+# - FRED: 2년만기 국채금리 (DGS2)
+# - Yahoo Finance: Flagstar Financial(FLG), S&P Banks ETF(KBE)의 하루 종가
+#   2022년 1월 1일부터 2025년 12월 31일까지 받아 같은 기간으로 한 번 더 골라내고, 처음 10줄을 출력해 확인한다.
+#
+# ## 그리기
+# - 왼쪽: Flagstar 주가(왼쪽 y축)와 S&P Banks ETF(오른쪽 y축). 주가 수준이 달라서 축을 둘로 나눈다.
+#   두 축의 범례를 하나로 합친다. 범례를 놓을 빈자리가 없어서 y축 아래쪽을 넓혀(왼쪽 0~42, 오른쪽 15~63)
+#   선이 없는 띠를 만들고, 그곳(왼쪽 아래)에 범례를 둔다.
+# - 오른쪽: 2년만기 국채금리. 범례는 선이 없는 오른쪽 아래에 둔다.
 # %%
 df0 = fetch_fred_series("DGS2", start_date=start, end_date=end)
 
@@ -90,8 +93,12 @@ ax[0].xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
 # ax[0].set_xlim([data.index.min(),data.index.max()])
 
 # 단위 표시 및 출처
-ax_left.legend(loc="upper left", bbox_to_anchor=(0.2, 1.0))
-ax_right.legend(loc="upper left", bbox_to_anchor=(0.2, 0.94))
+# 두 축의 범례를 하나로 합치고, y축 아래쪽을 넓혀 비운 자리에 범례를 둔다.
+ax_left.set_ylim(0, 42)
+ax_right.set_ylim(15, 63)
+h1, l1 = ax_left.get_legend_handles_labels()
+h2, l2 = ax_right.get_legend_handles_labels()
+ax_left.legend(h1 + h2, l1 + l2, loc="lower left")
 ax_left.yaxis.label.set_visible(True)
 
 ax_left.text(
@@ -133,7 +140,7 @@ ax[1].plot(
     df0["observation_date"], df0["DGS2"], label="2년만기 국채", color="blue", lw=2
 )
 
-ax[1].legend(loc="upper left", bbox_to_anchor=(0.3, 1))
+ax[1].legend(loc="lower right")
 ax[1].xaxis.set_major_locator(mdates.YearLocator())
 ax[1].xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
 

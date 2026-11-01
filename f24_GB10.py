@@ -1,26 +1,22 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 24] 10년물 미국채 수익률과 S&P500
-# ## required file
-#   - plot_def.py
-#   - fred_api.py
+#
+# ## 이 코드가 하는 일
+# FRED에서 10년만기 국채금리와 S&P500 지수를 받아 한 그림에 그린다(y축 두 개).
+#
+# ## 그림이 다루는 내용
+# 10년만기 국채금리는 주택담보대출 금리, 회사채 금리 등 여러 금리의 기준이 된다.
+# 금리가 오르면 기업의 미래 이익을 현재 가치로 바꿀 때 더 크게 깎이므로 주가에 부담이 된다.
+# 2023년 이후 금리와 주가가 어떻게 함께 움직였는지 비교한다.
+#
+# ## 결과물
+# pic_jpg/f24_GB10.jpg, pic_tif/f24_GB10.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - fred_api.py: FRED 자료 받기
 # %%
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -46,9 +42,12 @@ from fred_api import fetch_fred_series
 start = "2023-01-01"
 end = "2025-09-30"
 # %% [markdown]
-# ## Fetch data from FRED
-#   - S&P 500 (SP500)
-#   - T-Bill 10y (DGS10)
+# ## 자료 받기 (FRED)
+# - S&P 500 지수 (SP500)
+# - 10년만기 국채금리 (DGS10)
+# ## 그리기
+# - 두 자료를 날짜 기준으로 합친 뒤, 왼쪽 y축에 10년물 금리, 오른쪽 y축에 S&P500을 그린다.
+# - 두 축의 범례를 하나로 합쳐 왼쪽 위에 둔다.
 # %%
 dgs10_df = fetch_fred_series("DGS10", start_date=start, end_date=end)
 sp500_df = fetch_fred_series("SP500", start_date=start, end_date=end)
@@ -125,8 +124,10 @@ ax2.text(
     color="black",
     transform=ax1.transAxes,
 )
-ax1.legend(loc="upper left", bbox_to_anchor=(0.04, 0.8))
-ax2.legend(loc="upper left", bbox_to_anchor=(0.04, 0.74))
+# 두 축의 범례를 하나로 합친다.
+h1, l1 = ax1.get_legend_handles_labels()
+h2, l2 = ax2.get_legend_handles_labels()
+ax1.legend(h1 + h2, l1 + l2, loc="upper left")
 
 ax1.grid(True, linestyle="--", linewidth=0.7, alpha=0.7)
 

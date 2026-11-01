@@ -1,26 +1,23 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 20] Dot Plot (2024.9.18)
-# ## required file
-#   - plot_def.py
-#   - fred_api.py
-# ## data 디렉토리에 필요한 파일
-#   - f_Dot_plot.xlsx
+#
+# ## 이 코드가 하는 일
+# data/f_Dot_plot.xlsx를 읽어, 2024년 9월 18일 FOMC 위원들이 예상한 연도별 정책금리를 점으로 찍는다.
+#
+# ## 그림이 다루는 내용
+# 점도표(Dot Plot)는 FOMC 위원 한 사람 한 사람이 "각 연도 말에 정책금리가 얼마가 적절한가"를 적어 낸 것을
+# 점 하나씩으로 보여준다. 연준은 3·6·9·12월 회의 때 발표한다.
+# 점들이 모인 곳과 중앙값(검은 점)을 보면 연준이 앞으로 금리를 얼마나 내리거나 올릴 생각인지 알 수 있다.
+#
+# ## 자료
+# API를 쓰지 않고, 연준 발표 자료의 점도표를 엑셀 파일로 옮겨 적었다(year, rate 열).
+#
+# ## 결과물
+# pic_jpg/f20_dot_plot.jpg, pic_tif/f20_dot_plot.tif
+#
+# ## 필요한 파일
+# - plot_def.py (defs): 한글 폰트 설정, 그림 저장
+# - data/f_Dot_plot.xlsx
 # %%
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -28,7 +25,7 @@ import numpy as np
 
 
 # 한글 폰트 설정
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -46,7 +43,7 @@ from plot_def import *
 set_fonts()
 
 # 엑셀 파일 불러오기
-df = pd.read_excel("data/f_Dot_plot.xlsx")
+df = pd.read_excel("data/f_Dot_plot.xlsx", engine="openpyxl")
 
 # year가 문자열인지 확인 후 정렬 순서 지정
 df["year"] = df["year"].astype(str)

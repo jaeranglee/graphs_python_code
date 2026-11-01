@@ -1,27 +1,25 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 25] 미국 수익률 곡선
-# ## required file
-#   - plot_def.py
-#   - fred_api.py
+#
+# ## 이 코드가 하는 일
+# FRED에서 만기가 다른 국채금리(1개월~30년)와 하루짜리 금리를 받아 그림 두 장을 그린다.
+#
+# ## 그림이 다루는 내용
+# 수익률 곡선은 x축에 만기, y축에 금리를 놓고 이은 선이다.
+# 보통은 오래 빌려줄수록 금리가 높아 오른쪽 위로 올라가지만, 앞으로 금리가 내려갈 것으로 예상되면
+# 짧은 만기 금리가 더 높은 '역전'이 생긴다. 역전은 경기침체의 신호로 자주 언급된다.
+# - 그림 0: 2023년 9월 1일, 2025년 7월 15일, 2025년 8월 28일(책에 쓴 날짜)의 수익률 곡선
+# - 그림 1: 2024년 이후 30년, 10년, 1개월 국채금리와 IORB, RRP 금리의 흐름(책 본문에는 없는 참고용 그림)
+#
+# ## 결과물
+# pic_jpg/f25_yield_0.jpg(그림 25), pic_jpg/f25_yield_1.jpg(참고용), 같은 이름의 tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - fred_api.py: FRED 자료 받기
 # %%
 # 폰트 설정
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -42,7 +40,15 @@ start = "2021-01-01"
 end = date.today().strftime("%Y-%m-%d")
 
 # %% [markdown]
-# ## FRED 상의 시리즈 ID (Constant Maturity Treasury Rates)
+# ## 자료 받기 (FRED)
+# series_ids는 그림에 쓸 이름(왼쪽)과 FRED 자료 이름(오른쪽)을 짝지은 사전(dictionary)이다.
+# - 하루짜리 금리: 연준 RRP 금리(RRPONTSYAWARD), IORB, EFFR
+# - 국채금리(Constant Maturity): DGS1MO(1개월), DGS3MO, DGS6MO, DGS1(1년), DGS2, DGS3, DGS5, DGS7, DGS10, DGS20, DGS30
+# 반복문으로 모두 받아 하나의 표(df_all_all)로 합친다. 수익률 곡선에는 하루짜리 금리 중 RRP만 넣는다.
+#
+# ## 그리기
+# - 그림 0: 날짜별로 그날의 금리들을 만기 순서대로 이어 그린다.
+# - 그림 1: 금리 다섯 개를 시간에 따라 그린다. 범례는 선과 겹치지 않도록 위쪽 가운데에 2열로 둔다.
 # %%
 
 series_ids = {
@@ -71,7 +77,7 @@ all_data = {}
 for term, sid in series_ids.items():
     df = fetch_fred_series(sid, start_date=start, end_date=end)
 
-    df.rename(columns={df.columns[-1]: "value"}, inplace=True)
+    df = df.rename(columns={df.columns[-1]: "value"})
     all_data[term] = df.set_index("observation_date")["value"].to_dict()
 # print(all_data)
 
@@ -196,8 +202,7 @@ for i in [0, 1]:
             ax.plot(
                 df_filtered.index, series, label=col, color=color_map.get(col), lw=2
             )
-
-            ax.legend(loc="upper left", fontsize=10, bbox_to_anchor=(0.75, 1))
+        ax.legend(loc="upper center", fontsize=10, ncol=2)
         ax.text(
             0,
             -0.15,

@@ -1,24 +1,20 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 36] 단기 자금시장 유동성과 주식시장 변동성
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - fred_api.py
+#
+# ## 이 코드가 하는 일
+# FRED에서 단기 금리 두 개와 주가 변동성 지수를 받아 그림 두 개를 나란히 그린다.
+#
+# ## 그림이 다루는 내용
+# - 왼쪽: 3개월 CP 금리 - 3개월 국채금리. CP는 기업이 짧게 돈을 빌릴 때 발행하는 어음이다.
+#   돈을 구하기 어려워지면 기업이 더 높은 금리를 줘야 하므로 이 차이(스프레드)가 커진다. 자금시장의 긴장 정도를 보여준다.
+# - 오른쪽: 주가 변동성 지수. 투자자들이 앞으로 주가가 크게 흔들릴 것으로 예상할수록 높아져 '공포지수'라고도 부른다.
+#
+# ## 결과물
+# pic_jpg/f36_cb_tb_vix.jpg, pic_tif/f36_cb_tb_vix.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - fred_api.py: FRED 자료 받기
 # %%
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -27,7 +23,7 @@ import matplotlib.dates as mdates
 # 한글 폰트 설정
 
 # Set font depending on the platform
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -50,8 +46,12 @@ end = "2025-10-01"
 from fred_api import fetch_fred_series
 
 # %% [markdown]
-# ## FRED 자료 추출
-# - CBOE DJIA Volatility Index (VXDCLS), DTB3, RIFSPPFAAD90NB
+# ## 자료 받기 (FRED)
+# - 3개월 국채금리 (DTB3)
+# - 3개월 AA등급 금융기관 CP 금리 (RIFSPPFAAD90NB)
+# - CBOE 다우존스 변동성 지수 (VXDCLS): 그림에는 VIX로 표시한다.
+# ## 그리기
+# - 왼쪽: CP 금리에서 국채금리를 뺀 스프레드, 오른쪽: 변동성 지수
 # %%
 df0 = fetch_fred_series("DTB3", start_date=start, end_date=end)
 

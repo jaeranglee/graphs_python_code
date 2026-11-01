@@ -1,31 +1,30 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 43] 재무부 TGA 잔고 장기추이
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - fred_api.py
+#
+# ## 이 코드가 하는 일
+# FRED에서 재무부의 연준 예금(TGA) 잔액을 받아 2002년부터 가장 최근까지 그린다.
+#
+# ## 그림이 다루는 내용
+# [그림 33]과 같은 TGA를 더 긴 기간으로 본다. 2008년 금융위기 이후, 특히 코로나 때 잔액이 크게 늘었고,
+# 부채한도 문제가 생길 때마다 잔액이 줄었다가 다시 채워지는 모습이 반복된다.
+# 2025년 3월 19일 값을 점으로 강조하고, 경기침체 기간을 회색으로 칠한다.
+#
+# ## 결과물
+# pic_jpg/f43_tga_2002.jpg, pic_tif/f43_tga_2002.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 경기침체 기간(nber_recession), 그림 저장
+# - fred_api.py: FRED 자료 받기
+#
+# ## 자료 받기 (FRED)
+# - TGA 잔액 (D2WLTGAL): 매주 수요일 기준, 백만 달러. 1000으로 나눠 10억 달러로 그린다.
 # %%
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 # Set font depending on the platform
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 

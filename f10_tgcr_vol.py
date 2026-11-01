@@ -1,14 +1,25 @@
 # %% [markdown]
 # # [그림 10] MMF의 RRP와 TGCR 거래 규모
-# ## required file
-#   - fred_api.py
-#   - plot_def.py
-#   - nyfed_api_rate_volume.py
-#   - nyfed_rrp_vol.py
+#
+# ## 이 코드가 하는 일
+# 뉴욕 연준에서 TGCR 거래량과 RRP 거래액을 받아 한 그림에 그린다(y축 두 개).
+#
+# ## 그림이 다루는 내용
+# [그림 8]에서 본 것처럼 MMF는 연준 RRP에서 돈을 뺐다. 그 돈의 일부는 민간 레포 시장(국채담보 단기거래)으로 갔다.
+# 연준 RRP 거래액은 줄고 TGCR 거래량은 늘어나는 모습을 한 그림에서 비교한다.
+#
+# ## 결과물
+# pic_jpg/f10_tgcr_vol.jpg, pic_tif/f10_tgcr_vol.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - fred_api.py: FRED 자료 받기
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - nyfed_api_rate_volume.py: 뉴욕 연준 기준금리와 거래량 받기(fetch_all_secured_rates_vol)
+# - nyfed_rrp_vol.py: 뉴욕 연준 RRP 거래 자료 받기(fetch_rrp_vol)
 # %%
 import matplotlib.dates as mdates
 
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -26,13 +37,13 @@ from plot_def import *
 set_fonts()
 
 # %% [markdown]
-# ## New York Fed Markets Data API 에서 자료 추출
-#   - tgcr, sofr, bgcr, effr
-# ## Fetch RRP data from FRED
-#   - Liabilities and Capital: Liabilities: Reverse Repurchase Agreements: Week Average (WLRRAA)
-#       - Units: Millions of U.S. Dollars,
-#       - Not Seasonally Adjusted
-#       - Frequency: Weekly,
+# ## 자료 받기 (뉴욕 연준 Markets Data)
+# - fetch_all_secured_rates_vol(): TGCR, BGCR, SOFR, EFFR의 금리와 거래량. 그림에는 TGCR 거래량만 쓴다.
+# - fetch_rrp_vol(): 첫 번째 자료는 RRP 전체 거래액, 두 번째 자료 중 거래상대방이 mmf인 줄은 MMF의 RRP 거래액이다.
+# ## 자료 받기 (FRED)
+# - 연준 RRP 잔액 주평균 (WLRRAA): 불러오기만 하고 그림에는 쓰지 않는다.
+# ## 그리기
+# - 왼쪽 y축: TGCR 거래량, 오른쪽 y축: RRP 전체 거래액과 MMF의 RRP 거래액
 # %%
 from nyfed_api_rate_volume import fetch_all_secured_rates_vol
 from nyfed_rrp_vol import fetch_rrp_vol

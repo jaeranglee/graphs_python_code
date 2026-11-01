@@ -1,31 +1,32 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 47] 월별 미재무부 국채 바이백 낙찰규모
-# ## 같은 디렉토리에 필요한 file
-#   - plot_def.py : 한글폰트 추가, 그래프 저장
-#   - treasury_buybacks_api.py  : Treasury Fiscal Data, Treasury Buybacks Data Fetch
+#
+# ## 이 코드가 하는 일
+# 재무부 Fiscal Data에서 국채 바이백 결과를 받아 월별 금액을 막대그래프로 그린다.
+#
+# ## 그림이 다루는 내용
+# 국채 바이백은 재무부가 이미 발행한 국채를 만기 전에 시장에서 되사는 것이다.
+# 오래전에 발행돼 잘 거래되지 않는 국채를 사들여 국채시장의 거래를 원활하게 하고, 재정 자금을 관리하려는 목적이다.
+# 2024년부터 다시 시작했으며, 전체 바이백과 그중 만기가 10년 넘게 남은 국채의 바이백을 비교한다.
+#
+# ## 결과물
+# pic_jpg/f47_treasury_buybacks.jpg, pic_tif/f47_treasury_buybacks.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - treasury_buybacks_api.py: 바이백 결과를 받아 csv로 저장(fetch_buybacks)
+#
+# ## 자료 가공
+# - 낙찰 액면금액(par_amt_accepted)을 1e9로 나눠 10억 달러로 바꾼다.
+# - 남은 만기(일) = 만기일 - 바이백 날짜. 3,650일(10년) 이상인 것을 장기로 본다.
+# - 월별로 더해 전체(Total)와 장기(Matures after 10 years)를 나란히 막대로 그린다.
 # %%
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 # 폰트 설정
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 

@@ -1,8 +1,22 @@
 # %% [markdown]
 # # [그림 17] 베버리지커브: 구인율과 실업률 (colorful version)
-# ## required file
-#   - plot_def.py
-#   - fred_api.py
+#
+# ## 이 코드가 하는 일
+# FRED에서 구인율과 실업률을 받아, x축에 실업률, y축에 구인율을 놓고 달마다 점을 찍어 이은다.
+#
+# ## 그림이 다루는 내용
+# 베버리지커브는 실업률과 구인율의 관계이다. 보통 구인율이 높으면(일자리가 많으면) 실업률이 낮다.
+# 그래서 점들이 오른쪽 아래로 기울어진 곡선을 따라 움직인다.
+# 경기침체 때는 오른쪽 아래(실업 증가, 구인 감소)로, 회복 때는 왼쪽 위로 움직인다.
+# 코로나 이후에는 곡선이 위로 크게 올라갔다가 다시 내려왔는데, 실업을 크게 늘리지 않고 구인만 줄어든 것이어서
+# 경기 연착륙 논의와 연결된다. 기간마다 선의 색을 달리하고, 2024년 8월과 가장 최근 달을 큰 점으로 표시한다.
+#
+# ## 결과물
+# pic_jpg/f177_beveridge.jpg, pic_tif/f177_beveridge.tif (f17_beveridge.py와 같은 그림을 색을 더 써서 그린 판)
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - fred_api.py: FRED 자료 받기
 # %%
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -10,7 +24,7 @@ from matplotlib.ticker import PercentFormatter
 
 
 # 폰트 설정
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -37,13 +51,16 @@ start = "2000-12-01"
 end = "2029-12-31"
 
 # %% [markdown]
-# ## Fetch data from FRED
-#   - Job Openings: Total Nonfarm (JTSJOR)
-#       - Units:Rate,Seasonally Adjusted
-#       - Frequency: Monthly
-#   - Unemployment Rate (UNRATE)
-#       - Units: Percent,Seasonally Adjusted
-#       - Frequency:Monthly
+# ## 자료 받기 (FRED)
+# - 구인율 (JTSJOR): 구인건수 / (고용자 수 + 구인건수) x 100, 계절조정, 월별
+# - 실업률 (UNRATE): %, 계절조정, 월별
+# - 2000년 12월부터 가장 최근 자료까지 받는다(end를 먼 미래로 두면 있는 자료까지만 온다).
+#
+# ## 그리기
+# 1. 기간 목록(periods)의 기간마다 선의 색을 달리해 그린다.
+# 2. 모든 달을 회색 점으로 찍는다.
+# 3. 2024년 8월(검은 점)과 가장 최근 달(파란 점)을 크게 표시한다.
+# 4. 범례는 2열로 오른쪽 위에 둔다.
 # %%
 
 df0 = fetch_fred_series("JTSJOR", start_date=start, end_date=end)
@@ -68,8 +85,8 @@ df = df.sort_values("Date")
 # 2024년 8월 데이터 필터링
 highlight_row = df[df["Date"] == pd.Timestamp("2024-08-01")]
 
-# 2025년 7월 데이터 필터링
-highlight_row1 = df[df["Date"] == pd.Timestamp("2025-07-01")]
+# 가장 최근 달 데이터 필터링
+highlight_row1 = df[df["Date"] == df["Date"].max()]
 
 
 # 시각화 시작
@@ -86,7 +103,6 @@ periods = [
     ("2007-12-01", "2009-06-30", "blue", "2007.12 - 2009.6"),
     ("2009-07-01", "2020-02-29", "purple", "2009.7 - 2020.2"),
     ("2020-03-01", "2020-04-30", "brown", "2020.3 - 2020.4"),
-    ("2020-05-01", df["Date"].max(), "black", "2020.5 - 2025.7"),
     ("2020-05-01", df["Date"].max(), "black", f"2020.5 - {last_month}"),
 ]
 
@@ -126,7 +142,7 @@ if not highlight_row.empty:
         label="2024.8",
     )
 
-# 2025년 7월 점 강조
+# 가장 최근 달 점 강조
 if not highlight_row1.empty:
     ax.scatter(
         highlight_row1["Unemployment rate"],
@@ -176,7 +192,7 @@ ax.text(
 )
 
 plt.grid(False)
-plt.legend()
+plt.legend(loc="upper right", ncol=2)
 
 
 # 저장 및 출력

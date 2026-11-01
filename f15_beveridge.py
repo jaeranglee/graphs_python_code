@@ -11,7 +11,7 @@ import pandas as pd
 from matplotlib.ticker import PercentFormatter
 
 # 한글 폰트 설정
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -82,8 +82,8 @@ df = df.sort_values("Date")
 # 2024년 8월 데이터 필터링
 highlight_row = df[df["Date"] == pd.Timestamp("2024-08-01")]
 
-# 2025년 4월 데이터 필터링
-highlight_row1 = df[df["Date"] == pd.Timestamp("2025-04-01")]
+# 가장 최근 달 데이터 필터링
+highlight_row1 = df[df["Date"] == df["Date"].max()]
 
 
 # 시각화 시작
@@ -101,7 +101,6 @@ periods = [
     ("2007-12-01", "2009-06-30", "blue", "2007.12 - 2009.6"),
     ("2009-07-01", "2020-02-29", "purple", "2009.7 - 2020.2"),
     ("2020-03-01", "2020-04-30", "brown", "2020.3 - 2020.4"),
-    ("2020-05-01", df["Date"].max(), "black", "2020.5 - 2025.7"),
     ("2020-05-01", df["Date"].max(), "black", f"2020.5 - {last_month}"),
 ]
 
@@ -141,7 +140,7 @@ if not highlight_row.empty:
         label="2024.8",
     )
 
-# 2025년 4월 점 강조
+# 가장 최근 달 점 강조
 if not highlight_row1.empty:
     ax.scatter(
         highlight_row1["Unemployment rate"],
@@ -192,7 +191,7 @@ ax.text(
 )
 
 plt.grid(False)
-plt.legend()
+plt.legend(loc="upper right", ncol=2)
 
 
 # 저장 및 출력

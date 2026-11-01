@@ -1,30 +1,25 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # ## [그림 27] Bid to cover ratio
-# ## 같은 디렉토리에 필요한 file
-# - plot_def.py : 한글폰트 추가, 그래프 저장
-# - treasury_auctions_api.py : Treasury Fiscal Data, Treasury Auctions Data에서 data fetch
+#
+# ## 이 코드가 하는 일
+# 재무부 국채 경매 결과를 받아, 국채 종류별 응찰률(bid to cover ratio)의 흐름을 그린다.
+#
+# ## 그림이 다루는 내용
+# 응찰률 = 응찰 금액 합계 / 발행 금액. 예를 들어 100억 달러를 파는데 250억 달러어치 주문이 들어오면 2.5이다.
+# 응찰률이 높을수록 그 국채를 사려는 수요가 강하다는 뜻이다.
+# 경매마다 값이 들쭉날쭉해서 최근 6번 경매의 평균(이동평균)으로 그린다.
+#
+# ## 결과물
+# pic_jpg/f27_treasury_bid_to_cover.jpg, pic_tif/f27_treasury_bid_to_cover.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - treasury_auctions_api.py: 경매 결과 받기(fetch_securities_auction)
 # ## data 파일
-# - data/treasury_auctions_2024.csv
-# - fetch_securities_auction(start_date=start, end_date=end) 실행되며 자동 생성
+# - data/treasury_auctions_2024.csv: 코드를 실행하면 fetch_securities_auction()이 자동으로 만든다.
 # %%
 
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 

@@ -1,28 +1,24 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 9] 1일만기 국채담보 단기금융거래 이자율
-# ## required file
-#   - fred_api.py
-#   - plot_def.py
-#   - nyfed_api_all_rates.py
+#
+# ## 이 코드가 하는 일
+# 뉴욕 연준에서 TGCR 금리와 그 분포를, FRED에서 연준 RRP 금리를 받아 한 그림에 그린다.
+#
+# ## 그림이 다루는 내용
+# TGCR(Tri-party General Collateral Rate)은 국채를 담보로 하루 동안 돈을 빌리고 빌려줄 때의 금리이다.
+# 연준 RRP 금리는 MMF가 연준에 돈을 맡길 때 받는 금리라서, 시장 금리가 그보다 크게 낮아지기 어렵다(금리의 바닥 역할).
+# 그날 거래된 금리들이 얼마나 퍼져 있는지(백분위)를 띠로 함께 그려, 금리가 고르게 형성됐는지 볼 수 있다.
+#
+# ## 결과물
+# pic_jpg/f9_tgcr_rate_percentile.jpg, pic_tif/f9_tgcr_rate_percentile.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - fred_api.py: FRED 자료 받기
+# - plot_def.py: 한글 폰트 설정, 그림 저장
+# - nyfed_api_all_rates.py: 뉴욕 연준 기준금리 받기(fetch_all_secured_rates)
 # %%
 
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -40,8 +36,11 @@ from plot_def import *
 set_fonts()
 
 # %% [markdown]
-# ## Fetch Data from NY FED Markets Data, Reference Rates
-# - tgcr, sofr, bgcr, sofrai, effr, obfr 등 선택가능
+# ## 자료 받기 (뉴욕 연준 Markets Data)
+# - fetch_all_secured_rates()는 여러 기준금리를 한꺼번에 받는다. Type 열에서 원하는 금리만 고른다.
+# - rate_type_filter에 'tgcr' 대신 'sofr', 'bgcr', 'effr', 'obfr' 등을 넣으면 다른 금리를 그릴 수 있다.
+# - 금리와 함께 1·25·75·99 백분위 금리가 들어 있다.
+#   예를 들어 25 백분위는 그날 거래의 25%가 그 금리 이하에서 이루어졌다는 뜻이다.
 # %%
 from nyfed_api_all_rates import fetch_all_secured_rates
 
@@ -59,17 +58,17 @@ df_tgcr = df_all[df_all["Type"] == rate_type_filter.upper()].copy()
 df_tgcr = df_tgcr.sort_values("Date")
 
 # %% [markdown]
-# ## FRED series fetched
-#   - Overnight Reverse Repurchase Agreements Award Rate: Treasury Securities Sold by the Federal Reserve in the Temporary Open Market Operations (RRPONTSYAWARD)
-#       - Units: Percent,Not Seasonally Adjusted
-#       - Frequency: Daily
+# ## 자료 받기 (FRED)
+# - 연준 RRP 금리 (RRPONTSYAWARD): 하루 단위, %
 # %%
 from fred_api import fetch_fred_series
 
 df_onrrp = fetch_fred_series("RRPONTSYAWARD", start_date=start, end_date=end)
 
 # %% [markdown]
-# ## Plot
+# ## 그리기
+# - 선: TGCR(검정)과 RRP 금리
+# - 띠: TGCR의 25~75 백분위 범위와 1~99 백분위 범위(fill_between으로 두 선 사이를 칠한다)
 # %%
 fig, ax = plt.subplots(figsize=(9, 4.5), constrained_layout=True)
 

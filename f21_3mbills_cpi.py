@@ -1,31 +1,28 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.18.1
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
 # %% [markdown]
 # # [그림 21] 제2차 세계대전 전후 국채 수익률, 소비자물가 상승률
-# ## required file
-#   - plot_def.py
-#   - fred_api.py
+#
+# ## 이 코드가 하는 일
+# FRED에서 1941~1952년의 3개월 국채금리와 소비자물가를 받아 그림 두 개를 나란히 그린다.
+#
+# ## 그림이 다루는 내용
+# 제2차 세계대전 동안 미국 정부는 전쟁 비용을 마련하려고 국채를 많이 발행했다.
+# 연준은 정부가 싼 이자로 돈을 빌릴 수 있도록 3개월 국채금리를 0.375%에 묶어 두었다.
+# 전쟁이 끝난 뒤 물가가 크게 올랐지만 금리는 낮게 묶여 있었고, 1951년 재무부와 연준이 합의(Accord)한 뒤에야
+# 연준이 금리를 스스로 정하게 되었다. 금리를 낮게 묶으면 물가를 잡기 어렵다는 점을 보여주는 역사적 사례이다.
+#
+# ## 결과물
+# pic_jpg/f21_3mbills_cpi.jpg, pic_tif/f21_3mbills_cpi.tif
+#
+# ## 필요한 파일 (defs 폴더)
+# - plot_def.py: 한글 폰트 설정, 경기침체 기간(nber_recession), 그림 저장
+# - fred_api.py: FRED 자료 받기
 # %%
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 
 # 폰트 설정
-# 공통 함수 폴더(codes/defs)를 import 경로에 추가
+# 공통 함수 폴더(defs)를 import 경로에 추가
 import sys
 from pathlib import Path
 
@@ -48,9 +45,12 @@ end = "1952-01-01"
 from fred_api import *
 
 # %% [markdown]
-# ## Fetch data from FRED
-#   - CPI (not seasonally adjusted)
-#   - Load 3 Month T-bill
+# ## 자료 받기 (FRED)
+# - 3개월 국채금리 (TB3MS), 월별
+# - 소비자물가지수 (CPIAUCNS, 계절조정 전): pct_change(12)로 전년동월대비 상승률을 구한다.
+# ## 그리기
+# - 왼쪽: 3개월 국채금리, 오른쪽: 소비자물가 상승률
+# - nber_recession()으로 이 기간의 경기침체 기간을 받아 두 그림에 회색으로 칠한다.
 # %%
 df_cpins = fetch_fred_series("CPIAUCNS", start_date=start, end_date=end)
 df0 = fetch_fred_series("TB3MS", start_date=start, end_date=end)
